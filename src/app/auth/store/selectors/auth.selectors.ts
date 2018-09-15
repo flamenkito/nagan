@@ -4,23 +4,23 @@ import * as fromFeature from '../reducers';
 import * as fromAuth from '../reducers/auth.reducer';
 
 // auth
-export const selectAuthState = createSelector(
+export const selectAuthModuleState = createSelector(
   fromFeature.selectFeatureState,
-  (state: fromFeature.AuthState) => state.auth
+  (state: fromFeature.AuthModuleState) => state.auth
 );
 
-export const selectToken = createSelector(selectAuthState, fromAuth.getToken);
+export const selectToken = createSelector(selectAuthModuleState, fromAuth.getToken);
 export const selectPayload = createSelector(
-  selectAuthState,
+  selectAuthModuleState,
   fromAuth.getPayload
 );
 
 export const selectAuthLoading = createSelector(
-  selectAuthState,
+  selectAuthModuleState,
   fromAuth.getLoading
 );
 export const selectAuthLoaded = createSelector(
-  selectAuthState,
+  selectAuthModuleState,
   fromAuth.getLoaded
 );
-export const selectError = createSelector(selectAuthState, fromAuth.getError);
+export const selectAuthError = createSelector(selectAuthModuleState, fromAuth.getError);

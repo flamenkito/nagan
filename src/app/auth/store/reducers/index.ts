@@ -4,19 +4,19 @@ import * as fromCore from '@app/core/store';
 import * as fromAuth from './auth.reducer';
 import * as fromPouch from './pouch.reducer';
 
-export interface AuthState {
+export interface AuthModuleState {
   auth: fromAuth.State;
   pouch: fromPouch.State;
 }
 
 export interface State extends fromCore.State {
-  auth: AuthState;
+  authModule: AuthModuleState;
 }
 
-export const reducers: ActionReducerMap<AuthState> = {
+export const reducers: ActionReducerMap<AuthModuleState> = {
   auth: fromAuth.reducer,
   pouch: fromPouch.reducer
 };
 
 // feature state
-export const selectFeatureState = createFeatureSelector<AuthState>('auth');
+export const selectFeatureState = createFeatureSelector<AuthModuleState>('authModule');

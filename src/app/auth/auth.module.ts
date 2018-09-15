@@ -30,7 +30,7 @@ export class AuthModule {
 @NgModule({
   imports: [
     AuthModule,
-    StoreModule.forFeature('auth', reducers),
+    StoreModule.forFeature('authModule', reducers),
     EffectsModule.forFeature(effects),
     AuthRoutingModule
   ]

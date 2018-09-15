@@ -68,8 +68,10 @@ export class PouchService implements OnDestroy {
           .on('complete', wrapper(PouchActions.Complete))
           .on('error', errorWrapper);
 
+        Log.success('setup success');
+
         return () => {
-          Log.success('sync.cancel()');
+          Log.warning('sync cancel');
           sync.cancel();
         };
       } catch (err) {

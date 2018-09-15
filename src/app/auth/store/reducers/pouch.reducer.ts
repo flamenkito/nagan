@@ -1,15 +1,17 @@
-import { PouchActions } from '@app/auth/store/actions';
+import { PouchActions } from '../actions';
 
 export interface State {
-  // docs: {
-  //   [key: string]: any;
-  // };
   docs: any[];
+  loading: boolean;
+  loaded: boolean;
+  error: any | null;
 }
 
 export const INITIAL_STATE: State = {
-  // docs: {}
-  docs: []
+  docs: [],
+  loaded: false,
+  loading: false,
+  error: null
 };
 
 export function reducer(
@@ -17,22 +19,21 @@ export function reducer(
   action: PouchActions.Types
 ): State {
   switch (action.type) {
-    case PouchActions.DOCS: {
-      // return {
-      //   ...state,
-      //   docs: action.docs.reduce((acc, cur) => {
-      //     return {
-      //       ...acc,
-      //       [cur._id]: cur
-      //     };
-      //   }, {})
-      // };
-      return {
-        ...state,
-        docs: action.docs.slice()
-      };
+    case PouchActions.SETUP:
+    case PouchActions.ACTIVE: {
+      return { ...state, loaded: false, loading: true };
     }
-
+    case PouchActions.PAUSED:
+    case PouchActions.SETUP_SUCCESS:
+    case PouchActions.OPERATION_SUCCESS: {
+      return { ...state, loaded: true, loading: false };
+    }
+    case PouchActions.OPERATION_FAILURE: {
+      return { ...state, loaded: false, loading: false, error: action.error };
+    }
+    case PouchActions.DOCS: {
+      return { ...state, docs: [...action.docs] };
+    }
     default: {
       return state;
     }
@@ -40,3 +41,6 @@ export function reducer(
 }
 
 export const getDocs = (state: State) => state.docs;
+export const getLoaded = (state: State) => state.loaded;
+export const getLoading = (state: State) => state.loading;
+export const getError = (state: State) => state.error;

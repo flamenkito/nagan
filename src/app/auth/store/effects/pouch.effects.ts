@@ -37,7 +37,7 @@ export class PouchEffects {
   );
 
   @Effect()
-  docs$ = this.actions$.pipe(
+  paused$ = this.actions$.pipe(
     ofType<PouchActions.Paused>(PouchActions.PAUSED),
     switchMap(() => {
       return this.pouchService.getDocs();
