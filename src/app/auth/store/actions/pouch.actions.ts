@@ -2,7 +2,11 @@ import { Action } from '@ngrx/store';
 import { TokenModel } from '@app/auth/models';
 
 export namespace PouchActions {
+  export const UNAUTHORIZED = '[Pouch] Unathorized';
+
   export const SETUP = '[Pouch] Setup';
+  export const SETUP_SUCCESS = '[Pouch] Setup Success';
+  export const CANCEL_SYNC = '[Pouch] Cancel Sync';
   export const OPERATION_SUCCESS = '[Pouch] Operation Success';
   export const OPERATION_FAILURE = '[Pouch] Operation Failure';
 
@@ -16,9 +20,21 @@ export namespace PouchActions {
   export const DOCS = '[Pouch] Docs';
   export const UPDATE_ONE = '[Pouch] Update One';
 
+  export class Unathorized implements Action {
+    readonly type = UNAUTHORIZED;
+    constructor(public readonly reason?: string) {}
+  }
+
   export class Setup implements Action {
     readonly type = SETUP;
     constructor(public readonly token: TokenModel) {}
+  }
+  export class SetupSuccess implements Action {
+    readonly type = SETUP_SUCCESS;
+    constructor(public readonly response: any) {}
+  }
+  export class CancelSync implements Action {
+    readonly type = CANCEL_SYNC;
   }
   export class OperationSuccess implements Action {
     readonly type = OPERATION_SUCCESS;
@@ -67,7 +83,10 @@ export namespace PouchActions {
   }
 
   export type Types =
+    | Unathorized
     | Setup
+    | SetupSuccess
+    | CancelSync
     | OperationSuccess
     | OperationFailure
     | Change

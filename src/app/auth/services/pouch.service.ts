@@ -14,8 +14,9 @@ import { takeUntil, catchError, map } from 'rxjs/operators';
 import { PouchActions } from '@app/auth/store/actions';
 import { PayloadModel, TokenModel } from '@app/auth/models';
 import { POUCHDB } from '@app/shared';
+import { Logger } from '@app/shared/logger';
 
-const LOCAL_DB = 'localDb';
+const Log = new Logger('PouchService');
 
 @Injectable()
 export class PouchService implements OnDestroy {
@@ -25,18 +26,39 @@ export class PouchService implements OnDestroy {
 
   private getEvents(token: TokenModel): Observable<PouchActions.Types> {
     return Observable.create((observer: Observer<PouchActions.Types>) => {
+      const wrapper = action => (payload?) =>
+        observer.next(new action(payload));
+
+      const errorWrapper = (payload?) => {
+        if (payload && payload.error === 'unauthorized') {
+          observer.next(new PouchActions.Unathorized(payload.reason));
+        } else {
+          observer.next(new PouchActions.Error(payload));
+        }
+      };
+
       try {
         const { userCtx } = jwt.decode(token.accessToken) as PayloadModel;
 
+        // local
+        this.localDb = new PouchDB(userCtx.db, {
+          revs_limit: 1,
+          auto_compaction: true
+        });
+        this.localDb.createIndex({ index: { fields: ['type'] } });
+
+        this.localDb.on('error', errorWrapper);
+
+        // remote
         const remoteDb = new PouchDB(POUCHDB(userCtx.db), {
-          headers: { Authorization: `Bearer ${token.accessToken}` }
+          headers: { Authorization: `Bearer ${token.accessToken}` },
+          revs_limit: 1,
+          auto_compaction: true
         });
 
-        const wrapper = action => (payload?) => {
-          // console.log({ action, payload });
-          observer.next(new action(payload));
-        };
+        remoteDb.on('error', errorWrapper);
 
+        // sync
         const sync = this.localDb
           .sync(remoteDb, { live: true, retry: true })
           .on('change', wrapper(PouchActions.Change))
@@ -44,10 +66,10 @@ export class PouchService implements OnDestroy {
           .on('active', wrapper(PouchActions.Active))
           .on('denied', wrapper(PouchActions.Denied))
           .on('complete', wrapper(PouchActions.Complete))
-          .on('error', wrapper(PouchActions.Error))
-          .on('denied', wrapper(PouchActions.Error));
+          .on('error', errorWrapper);
 
         return () => {
+          Log.success('sync.cancel()');
           sync.cancel();
         };
       } catch (err) {
@@ -57,16 +79,13 @@ export class PouchService implements OnDestroy {
     });
   }
 
-  constructor() {
-    this.localDb = new PouchDB(LOCAL_DB);
-    this.localDb.createIndex({ index: { fields: ['type'] } });
-
-    // this.localDb.testPlugin();
-  }
-
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  cancelSync() {
+    this.destroy$.next();
   }
 
   setupRemote(token: TokenModel): Observable<PouchActions.Types> {

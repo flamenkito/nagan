@@ -27,6 +27,16 @@ export class PouchEffects {
   );
 
   @Effect()
+  cancelSync$ = this.actions$.pipe(
+    ofType<PouchActions.CancelSync>(PouchActions.CANCEL_SYNC),
+    switchMap(() => {
+      const response = this.pouchService.cancelSync();
+      return of(new PouchActions.OperationSuccess(response));
+    }),
+    catchError(err => of(new PouchActions.OperationFailure(err)))
+  );
+
+  @Effect()
   docs$ = this.actions$.pipe(
     ofType<PouchActions.Paused>(PouchActions.PAUSED),
     switchMap(() => {

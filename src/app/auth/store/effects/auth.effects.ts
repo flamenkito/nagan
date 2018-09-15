@@ -62,6 +62,7 @@ export class AuthEffects {
   logoutUserSuccess$ = this.actions$.pipe(
     ofType<AuthActions.LogoutUserSuccess>(AuthActions.LOGOUT_USER_SUCCESS),
     mergeMap(() => [
+      new PouchActions.CancelSync(),
       new AuthActions.LoginRedirect(),
       new FooterActions.Popup('Logged out')
     ])
