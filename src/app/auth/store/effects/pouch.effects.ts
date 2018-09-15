@@ -4,7 +4,7 @@ import { switchMap, map, catchError } from 'rxjs/operators';
 
 import { FooterActions } from '@app/core/store/actions';
 import { PouchService } from '@app/auth/services';
-import { PouchActions } from '@app/auth/store/actions';
+import { PouchActions, AuthActions } from '@app/auth/store/actions';
 
 import { getError } from '@app/shared/get-error';
 import { of } from 'rxjs';
@@ -15,6 +15,12 @@ export class PouchEffects {
     private readonly actions$: Actions,
     private readonly pouchService: PouchService
   ) {}
+
+  @Effect()
+  unauthorized$ = this.actions$.pipe(
+    ofType<PouchActions.Unathorized>(PouchActions.UNAUTHORIZED),
+    map(() => new AuthActions.LogoutUserRequest())
+  );
 
   @Effect()
   setup$ = this.actions$.pipe(
@@ -42,6 +48,7 @@ export class PouchEffects {
     switchMap(() => {
       return this.pouchService.getDocs();
     }),
+    map(docs => new PouchActions.Docs(docs)),
     catchError(err => of(new PouchActions.OperationFailure(err)))
   );
 
@@ -50,6 +57,9 @@ export class PouchEffects {
     ofType<PouchActions.UpdateOne>(PouchActions.UPDATE_ONE),
     switchMap(({ update }) => {
       return this.pouchService.updateOne(update);
+    }),
+    map((response: PouchDB.Core.Response) => {
+      return new PouchActions.OperationSuccess(response);
     }),
     catchError(err => of(new PouchActions.OperationFailure(err)))
   );

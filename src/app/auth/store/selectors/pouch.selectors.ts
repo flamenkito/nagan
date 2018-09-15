@@ -2,6 +2,7 @@ import { createSelector } from '@ngrx/store';
 
 import * as fromFeature from '../reducers';
 import * as fromPouch from '../reducers/pouch.reducer';
+import { DocumentModel } from '@app/auth/models';
 
 // pouch
 export const selectPouchState = createSelector(
@@ -9,7 +10,15 @@ export const selectPouchState = createSelector(
   (state: fromFeature.AuthModuleState) => state.pouch
 );
 
-export const selectDocs = createSelector(selectPouchState, fromPouch.getDocs);
+export const selectAllDocs = createSelector(
+  selectPouchState,
+  fromPouch.getDocs
+);
+
+export const selectDocs = (docType: string) =>
+  createSelector(selectAllDocs, (docs: DocumentModel[]) =>
+    docs.filter(doc => doc.type === docType)
+  );
 
 export const selectPouchLoading = createSelector(
   selectPouchState,
@@ -19,4 +28,7 @@ export const selectPouchLoaded = createSelector(
   selectPouchState,
   fromPouch.getLoaded
 );
-export const selectPouchError = createSelector(selectPouchState, fromPouch.getError);
+export const selectPouchError = createSelector(
+  selectPouchState,
+  fromPouch.getError
+);

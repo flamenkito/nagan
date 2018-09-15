@@ -12,7 +12,7 @@ PouchDB.plugin(JWT);
 
 import { takeUntil, catchError, map } from 'rxjs/operators';
 import { PouchActions } from '@app/auth/store/actions';
-import { PayloadModel, TokenModel } from '@app/auth/models';
+import { PayloadModel, TokenModel, DocumentModel } from '@app/auth/models';
 import { POUCHDB } from '@app/shared';
 import { Logger } from '@app/shared/logger';
 
@@ -97,7 +97,19 @@ export class PouchService implements OnDestroy {
     );
   }
 
-  getDocs(): Observable<PouchActions.Types> {
+  getDocs(): Observable<DocumentModel[]> {
+    return from(
+      this.localDb.allDocs({
+        include_docs: true,
+        attachments: true,
+        startkey: '_design\uffff'
+      })
+    ).pipe(
+      map((res: PouchDB.Core.AllDocsResponse<{}>) => {
+        return res.rows.map(row => row.doc);
+      })
+    );
+    /*
     return from(this.localDb.find({ selector: { type: 'doc' } })).pipe(
       map((res: PouchDB.Find.FindResponse<{}>) => {
         return new PouchActions.Docs(res.docs);
@@ -105,14 +117,10 @@ export class PouchService implements OnDestroy {
       catchError(err => of(new PouchActions.OperationFailure(err)))
       // share()
     );
+    */
   }
 
-  updateOne(update: any): Observable<PouchActions.Types> {
-    return from(this.localDb.put(update)).pipe(
-      map((res: PouchDB.Core.Response) => {
-        return new PouchActions.OperationSuccess(res);
-      }),
-      catchError(err => of(new PouchActions.OperationFailure(err)))
-    );
+  updateOne(update: any): Observable<PouchDB.Core.Response> {
+    return from(this.localDb.put(update));
   }
 }

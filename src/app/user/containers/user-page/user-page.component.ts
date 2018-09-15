@@ -15,7 +15,7 @@ export class UserPageComponent {
   docs$: Observable<any[]>;
 
   constructor(private readonly store: Store<fromAuth.State>) {
-    this.docs$ = store.select(fromAuth.selectDocs);
+    this.docs$ = store.select(fromAuth.selectDocs('doc'));
   }
 
   onSelectDoc(doc: any) {
@@ -27,7 +27,7 @@ export class UserPageComponent {
           name
         })
       );
-   }
+    }
   }
 
   onLogout() {
