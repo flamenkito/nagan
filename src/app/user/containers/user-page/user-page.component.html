@@ -9,23 +9,20 @@
   <div class="card-header sticky-top">
     <ul class="nav nav-tabs card-header-tabs">
       <li class="nav-item">
-        <a class="nav-link active" href="#">Active</a>
+        <a class="nav-link" [routerLink]="['/user', 'config']" routerLinkActive="active">Config</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#">Link</a>
+        <a class="nav-link" [routerLink]="['/user', 'maps']" routerLinkActive="active">Maps</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#">Link</a>
+        <a class="nav-link" [routerLink]="['/user', 'docs']" routerLinkActive="active">Documents</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link disabled" href="#">Disabled</a>
+        <a class="nav-link disabled">Disabled</a>
       </li>
     </ul>
   </div>
   <div class="card-body">
-    <app-docs
-      [docs]="docs$ | async"
-      (select)="onSelectDoc($event)">
-    </app-docs>
+    <router-outlet></router-outlet>
   </div>
 </div>

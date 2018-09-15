@@ -10,15 +10,30 @@ export const selectPouchState = createSelector(
   (state: fromFeature.AuthModuleState) => state.pouch
 );
 
-export const selectAllDocs = createSelector(
+export const selectEntities = createSelector(
   selectPouchState,
-  fromPouch.getDocs
+  fromPouch.getEntities
+);
+
+export const selectIds = createSelector(selectPouchState, fromPouch.getIds);
+
+export const selectAllDocs = createSelector(
+  selectEntities,
+  selectIds,
+  (entities: { [key: string]: DocumentModel }, ids: string[]) => {
+    return ids.map(id => entities[id]);
+  }
 );
 
 export const selectDocs = (docType: string) =>
-  createSelector(selectAllDocs, (docs: DocumentModel[]) =>
-    docs.filter(doc => doc.type === docType)
-  );
+  createSelector(selectAllDocs, (docs: DocumentModel[]) => {
+    return docs.filter(doc => doc.type === docType);
+  });
+
+export const selectFirst = (docId: string) =>
+  createSelector(selectAllDocs, (docs: DocumentModel[]) => {
+    return docs.find(doc => doc._id === docId) || {};
+  });
 
 export const selectPouchLoading = createSelector(
   selectPouchState,

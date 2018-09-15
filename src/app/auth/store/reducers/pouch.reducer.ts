@@ -1,14 +1,17 @@
 import { PouchActions } from '../actions';
+import { DocumentModel } from '@app/auth/models';
 
 export interface State {
-  docs: any[];
+  entities: { [key: string]: DocumentModel };
+  ids: string[];
   loading: boolean;
   loaded: boolean;
   error: any | null;
 }
 
 export const INITIAL_STATE: State = {
-  docs: [],
+  entities: {},
+  ids: [],
   loaded: false,
   loading: false,
   error: null
@@ -31,8 +34,15 @@ export function reducer(
     case PouchActions.OPERATION_FAILURE: {
       return { ...state, loaded: false, loading: false, error: action.error };
     }
-    case PouchActions.DOCS: {
-      return { ...state, docs: [...action.docs] };
+    case PouchActions.ALL_DOCS: {
+      const ids = action.docs.map(doc => doc._id);
+      const entities = action.docs.reduce((acc, cur) => {
+        return {
+          ...acc,
+          [cur._id]: cur
+        };
+      }, {});
+      return { ...state, entities, ids };
     }
     default: {
       return state;
@@ -40,7 +50,8 @@ export function reducer(
   }
 }
 
-export const getDocs = (state: State) => state.docs;
+export const getEntities = (state: State) => state.entities;
+export const getIds = (state: State) => state.ids;
 export const getLoaded = (state: State) => state.loaded;
 export const getLoading = (state: State) => state.loading;
 export const getError = (state: State) => state.error;

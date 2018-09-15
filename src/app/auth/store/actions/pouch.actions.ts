@@ -17,7 +17,7 @@ export namespace PouchActions {
   export const COMPLETE = '[Pouch] Complete';
   export const ERROR = '[Pouch] Error';
 
-  export const DOCS = '[Pouch] Docs';
+  export const ALL_DOCS = '[Pouch] AllDocs';
   export const UPDATE_ONE = '[Pouch] Update One';
 
   export class Unathorized implements Action {
@@ -73,8 +73,8 @@ export namespace PouchActions {
     constructor(public readonly error: any) {}
   }
 
-  export class Docs implements Action {
-    readonly type = DOCS;
+  export class AllDocs implements Action {
+    readonly type = ALL_DOCS;
     constructor(public readonly docs: any[]) {}
   }
   export class UpdateOne implements Action {
@@ -95,6 +95,6 @@ export namespace PouchActions {
     | Denied
     | Complete
     | Error
-    | Docs
+    | AllDocs
     | UpdateOne;
 }

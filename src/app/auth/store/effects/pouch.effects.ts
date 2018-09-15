@@ -48,7 +48,7 @@ export class PouchEffects {
     switchMap(() => {
       return this.pouchService.getDocs();
     }),
-    map(docs => new PouchActions.Docs(docs)),
+    map(docs => new PouchActions.AllDocs(docs)),
     catchError(err => of(new PouchActions.OperationFailure(err)))
   );
 

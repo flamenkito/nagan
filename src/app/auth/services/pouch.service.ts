@@ -112,7 +112,7 @@ export class PouchService implements OnDestroy {
     /*
     return from(this.localDb.find({ selector: { type: 'doc' } })).pipe(
       map((res: PouchDB.Find.FindResponse<{}>) => {
-        return new PouchActions.Docs(res.docs);
+        return new PouchActions.AllDocs(res.docs);
       }),
       catchError(err => of(new PouchActions.OperationFailure(err)))
       // share()

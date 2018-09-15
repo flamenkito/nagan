@@ -12,23 +12,7 @@ import { AuthActions, PouchActions } from '@app/auth/store';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UserPageComponent {
-  docs$: Observable<any[]>;
-
-  constructor(private readonly store: Store<fromAuth.State>) {
-    this.docs$ = store.select(fromAuth.selectDocs('doc'));
-  }
-
-  onSelectDoc(doc: any) {
-    const name = prompt('Update todo name', doc.name);
-    if (name !== null) {
-      this.store.dispatch(
-        new PouchActions.UpdateOne({
-          ...doc,
-          name
-        })
-      );
-    }
-  }
+  constructor(private readonly store: Store<fromAuth.State>) {}
 
   onLogout() {
     this.store.dispatch(new AuthActions.LogoutUserRequest());
