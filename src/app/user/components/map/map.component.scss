@@ -1,0 +1,19 @@
+[appDraggable] {
+  background-color: rgba(gray, 0.5);
+  padding: 0.3rem;
+  border-radius: 0.3rem;
+  display: flex;
+  cursor: move;
+  position: absolute;
+}
+
+.drag-active {
+  > app-element {
+    visibility: hidden;
+  }
+}
+
+[appDraggable]:hover {
+  background-color: rgba(darkorange, 0.5);
+  // background-color: rgba(green, 0.5);
+}

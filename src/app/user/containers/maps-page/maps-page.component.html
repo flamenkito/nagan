@@ -1,1 +1,9 @@
-<pre>{{ maps$ | async | json }}</pre>
+<app-map
+  [layers]="layers$ | async"
+  [available]="available$ | async"
+  [elements]="elements$ | async"
+  [services]="services$ | async"
+  (load)="onLoad($event)"
+  (subscriptions)="onSubscribe($event)"
+  (move)="onMove($event)">
+</app-map>

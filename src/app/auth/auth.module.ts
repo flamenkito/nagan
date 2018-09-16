@@ -9,9 +9,11 @@ import { containers } from './containers';
 import { components } from './components';
 import { guards } from './guards';
 import { services } from './services';
+
+// store and effects
 import { StoreModule } from '@ngrx/store';
-import { reducers, effects } from '@app/auth/store';
 import { EffectsModule } from '@ngrx/effects';
+import { reducers, effects } from './store';
 
 @NgModule({
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
@@ -30,9 +32,9 @@ export class AuthModule {
 @NgModule({
   imports: [
     AuthModule,
+    AuthRoutingModule,
     StoreModule.forFeature('authModule', reducers),
-    EffectsModule.forFeature(effects),
-    AuthRoutingModule
+    EffectsModule.forFeature(effects)
   ]
 })
 export class RootAuthModule {}

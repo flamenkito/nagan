@@ -9,7 +9,7 @@ import { PouchActions } from '@app/auth/store';
   selector: 'app-docs-page',
   templateUrl: './docs-page.component.html',
   styleUrls: ['./docs-page.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DocsPageComponent {
   docs$: Observable<any[]>;

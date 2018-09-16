@@ -19,4 +19,6 @@ export const reducers: ActionReducerMap<AuthModuleState> = {
 };
 
 // feature state
-export const selectFeatureState = createFeatureSelector<AuthModuleState>('authModule');
+export const selectFeatureState = createFeatureSelector<AuthModuleState>(
+  'authModule'
+);

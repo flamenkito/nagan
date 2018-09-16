@@ -1,0 +1,26 @@
+<div>
+  <!-- layer -->
+  <div *ngFor="let layer of layers">
+    {{ layer.name }}
+
+    <div style="position: relative;">
+      <!-- element -->
+      <div *ngFor="let element of layer.elements; index as elementIndex"
+        [ngStyle]="element.style"
+        appDraggable
+        dragActiveClass="drag-active"
+        (dragEnd)="onDragEnd(layer, elementIndex, $event, el)"
+        #el>
+        <app-element [element]="element" [state]="getElementState(element)">
+        </app-element>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<pre>{{ available | json }}</pre>
+<pre>{{ elements | json }}</pre>
+<pre>{{ layers | json }}</pre>
+<pre>{{ services | json }}</pre>

@@ -7,15 +7,18 @@ import {
   HttpInterceptor,
   HttpErrorResponse
 } from '@angular/common/http';
+
 import { Observable } from 'rxjs';
 import { retry } from 'rxjs/operators';
+
+import { environment } from '@env/environment';
+
 @Injectable()
 export class ServerErrorsInterceptor implements HttpInterceptor {
   intercept(
     request: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    // If the call fails, retry until 5 times before throwing an error
-    return next.handle(request).pipe(retry(5));
+    return next.handle(request).pipe(retry(environment.retry || 0));
   }
 }

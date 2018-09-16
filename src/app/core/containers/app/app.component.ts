@@ -8,8 +8,8 @@ import * as fromAuth from '@app/auth/store';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  styleUrls: ['./app.component.scss']
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent {
   footerMessage$: Observable<string>;
@@ -17,6 +17,6 @@ export class AppComponent {
 
   constructor(private readonly store: Store<fromCore.State>) {
     this.footerMessage$ = store.pipe(select(fromCore.selectFooterMessage));
-    this.loading$ = store.pipe(select(fromAuth.selectLoading));
+    this.loading$ = store.pipe(select(fromAuth.selectAuthLoading));
   }
 }

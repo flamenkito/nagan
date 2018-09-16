@@ -6,10 +6,14 @@ import * as fromAuth from '../reducers/auth.reducer';
 // auth
 export const selectAuthModuleState = createSelector(
   fromFeature.selectFeatureState,
-  (state: fromFeature.AuthModuleState) => state.auth
+  (state: fromFeature.AuthModuleState) =>
+    (state && state.auth) || fromAuth.INITIAL_STATE
 );
 
-export const selectToken = createSelector(selectAuthModuleState, fromAuth.getToken);
+export const selectToken = createSelector(
+  selectAuthModuleState,
+  fromAuth.getToken
+);
 export const selectPayload = createSelector(
   selectAuthModuleState,
   fromAuth.getPayload
@@ -23,4 +27,7 @@ export const selectAuthLoaded = createSelector(
   selectAuthModuleState,
   fromAuth.getLoaded
 );
-export const selectAuthError = createSelector(selectAuthModuleState, fromAuth.getError);
+export const selectAuthError = createSelector(
+  selectAuthModuleState,
+  fromAuth.getError
+);

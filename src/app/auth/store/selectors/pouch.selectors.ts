@@ -2,12 +2,13 @@ import { createSelector } from '@ngrx/store';
 
 import * as fromFeature from '../reducers';
 import * as fromPouch from '../reducers/pouch.reducer';
-import { DocumentModel } from '@app/auth/models';
+import { DocumentModel, ConfigModel } from '@app/auth/models';
 
 // pouch
 export const selectPouchState = createSelector(
   fromFeature.selectFeatureState,
-  (state: fromFeature.AuthModuleState) => state.pouch
+  (state: fromFeature.AuthModuleState) =>
+    (state && state.pouch) || fromPouch.INITIAL_STATE
 );
 
 export const selectEntities = createSelector(
@@ -31,9 +32,24 @@ export const selectDocs = (docType: string) =>
   });
 
 export const selectFirst = (docId: string) =>
-  createSelector(selectAllDocs, (docs: DocumentModel[]) => {
-    return docs.find(doc => doc._id === docId) || {};
-  });
+  createSelector(
+    selectAllDocs,
+    (docs: DocumentModel[]): DocumentModel => {
+      return docs.find(doc => doc._id === docId);
+    }
+  );
+
+export const selectConfig = createSelector(
+  selectFirst('config'),
+  // TODO: add validation?
+  (config): ConfigModel => {
+    return <ConfigModel>(<any>config);
+  }
+);
+
+export const selectAvailable = createSelector(selectConfig, config => {
+  return (config && config.elements) || {};
+});
 
 export const selectPouchLoading = createSelector(
   selectPouchState,

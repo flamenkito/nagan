@@ -8,7 +8,7 @@ import { Store, select } from '@ngrx/store';
   selector: 'app-config-page',
   templateUrl: './config-page.component.html',
   styleUrls: ['./config-page.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ConfigPageComponent {
   config$: Observable<any>;

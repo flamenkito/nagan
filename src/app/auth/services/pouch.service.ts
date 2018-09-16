@@ -16,7 +16,7 @@ import { PayloadModel, TokenModel, DocumentModel } from '@app/auth/models';
 import { POUCHDB } from '@app/shared';
 import { Logger } from '@app/shared/logger';
 
-const Log = new Logger('PouchService');
+const Log = Logger('PouchService');
 
 @Injectable()
 export class PouchService implements OnDestroy {

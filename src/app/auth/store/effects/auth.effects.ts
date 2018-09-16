@@ -53,7 +53,7 @@ export class AuthEffects {
     map(action => action.token),
     mergeMap(token => [
       new PouchActions.Setup(token),
-      new RouterActions.Navigate(['/user']),
+      new RouterActions.Navigate(['/user', 'maps']),
       new FooterActions.Popup('Logged in')
     ])
   );

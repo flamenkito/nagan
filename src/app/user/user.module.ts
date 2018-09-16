@@ -10,8 +10,15 @@ import { components } from './components';
 import { guards } from './guards';
 import { services } from './services';
 
+// store and effects
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { reducers, effects } from './store';
+
+import { DragAndDropModule } from '@app/draggable/drag-and-drop.module';
+
 @NgModule({
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, DragAndDropModule],
   declarations: [...containers, ...components],
   exports: [...containers, ...components]
 })
@@ -25,6 +32,11 @@ export class UserModule {
 }
 
 @NgModule({
-  imports: [UserModule, UserRoutingModule]
+  imports: [
+    UserModule,
+    UserRoutingModule,
+    StoreModule.forFeature('userModule', reducers),
+    EffectsModule.forFeature(effects)
+  ]
 })
 export class RootUserModule {}

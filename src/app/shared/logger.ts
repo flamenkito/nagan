@@ -1,35 +1,30 @@
-export class Logger {
-  constructor(private readonly location: string) {}
-
-  consoleColor(style: string, message: string, info?: string) {
-    const args = [`%c ${this.location}: ${message} `, style];
+function consoleColor(style: string, location: string) {
+  return (message: string, info?: any) => {
+    const args = [`%c ${location}: ${message} `, style];
     if (info) {
       args.push(info);
     }
     console.log(...args);
-  }
+  };
+}
 
-  success(message: string, info?: string) {
-    this.consoleColor(
+export function Logger(location: string) {
+  return {
+    success: consoleColor(
       'background: green; color: white; display: block;',
-      message,
-      info
-    );
-  }
-
-  warning(message: string, info?: string) {
-    this.consoleColor(
+      location
+    ),
+    warning: consoleColor(
       'background: darkorange; color: white; display: block;',
-      message,
-      info
-    );
-  }
-
-  danger(message: string, info?: string) {
-    this.consoleColor(
+      location
+    ),
+    danger: consoleColor(
       'background: firebrick; color: white; display: block;',
-      message,
-      info
-    );
-  }
+      location
+    ),
+    info: consoleColor(
+      'background: cadetblue; color: white; display: block;',
+      location
+    )
+  };
 }

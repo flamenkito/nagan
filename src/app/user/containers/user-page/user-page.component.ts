@@ -9,7 +9,7 @@ import { AuthActions, PouchActions } from '@app/auth/store';
   selector: 'app-user-page',
   templateUrl: './user-page.component.html',
   styleUrls: ['./user-page.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class UserPageComponent {
   constructor(private readonly store: Store<fromAuth.State>) {}
