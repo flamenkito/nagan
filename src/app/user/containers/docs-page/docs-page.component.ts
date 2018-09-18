@@ -15,7 +15,7 @@ export class DocsPageComponent {
   docs$: Observable<any[]>;
 
   constructor(private readonly store: Store<fromAuth.State>) {
-    this.docs$ = store.pipe(select(fromAuth.selectDocs('doc')));
+    this.docs$ = store.pipe(select(fromAuth.selectByType('doc')));
   }
 
   onSelectDoc(doc: any) {

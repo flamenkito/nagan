@@ -12,9 +12,10 @@ PouchDB.plugin(JWT);
 
 import { takeUntil, catchError, map } from 'rxjs/operators';
 import { PouchActions } from '@app/auth/store/actions';
-import { PayloadModel, TokenModel, DocumentModel } from '@app/auth/models';
+import { PayloadModel, TokenModel } from '@app/auth/models';
 import { POUCHDB } from '@app/shared';
 import { Logger } from '@app/shared/logger';
+import { DocumentModel } from '@app/shared/models';
 
 const Log = Logger('PouchService');
 

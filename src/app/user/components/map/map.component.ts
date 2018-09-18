@@ -9,26 +9,33 @@ import {
   OnInit,
   OnDestroy
 } from '@angular/core';
-import { ElementModel, ScriptModel } from '@app/user/models';
+import {
+  LoadedScriptModel,
+  LayerModel,
+  WidgetModel,
+  ElementModel,
+  LoadableScriptModel,
+  RequestModel
+} from '@app/user/models';
 import { Logger } from '@app/shared/logger';
-
-import { DropEvent } from '@app/draggable/droppable.directive';
-
-interface LayerModel {
-  name: string;
-  description: string;
-  elements: [
-    {
-      element: string;
-      style: { [key: string]: string };
-      services: string[];
-    }
-  ];
-  _id: string;
-  _rev: string;
-}
+import { MapModel } from '@app/user/models/map.model';
+import { IMap, DocumentModel } from '@app/shared/models';
+import { ActivatedRoute } from '@angular/router';
 
 const Log = Logger('MapComponent');
+
+const by = (props: IMap) => (item: any) => {
+  return Object.keys(props).every(
+    prop => String(item[prop]) === String(props[prop])
+  );
+};
+
+const findBy = Symbol('findBy');
+Array.prototype[findBy] = (props: IMap) => {
+  return Object.keys(props).every(
+    prop => String(this[prop]) === String(props[prop])
+  );
+};
 
 @Component({
   selector: 'app-map',
@@ -38,20 +45,27 @@ const Log = Logger('MapComponent');
 })
 export class MapComponent implements OnInit, OnChanges, OnDestroy {
   @Input()
+  elementMap: IMap<LoadableScriptModel>;
+  @Input()
+  requestMap: IMap<RequestModel>;
+
+  @Input()
+  map: MapModel;
+  @Input()
   layers: LayerModel[];
   @Input()
-  available: { [key: string]: ScriptModel };
+  elements: ElementModel[];
   @Input()
-  elements: { [key: string]: ElementModel };
-  @Input()
-  services: any[];
+  subscriptions: DocumentModel[];
 
   @Output()
-  load = new EventEmitter<ScriptModel[]>();
+  load = new EventEmitter<string[]>();
   @Output()
-  subscriptions = new EventEmitter<string[]>();
+  subscribe = new EventEmitter<string[]>();
   @Output()
   move = new EventEmitter<any>();
+  @Output()
+  selectMap = new EventEmitter<string>();
 
   adjustStyle(element, event) {
     let style = { ...element.style };
@@ -72,72 +86,112 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     }
     return style;
   }
-  onDragEnd(layer: LayerModel, elementIndex, event, el) {
-    const element = layer.elements[elementIndex];
+  onDragEnd(map: MapModel, elementIndex, event, el) {
+    const element = map.widgets[elementIndex];
     const style = this.adjustStyle(element, event);
-    const elements = layer.elements.map((item, index) => {
+    const widgets = map.widgets.map((item, index) => {
       return index === elementIndex ? { ...element, style } : item;
     });
-
     el.style.display = 'none';
-    this.move.emit({ ...layer, elements });
+    this.move.emit({ ...map, widgets });
+  }
+
+  constructor(private readonly route: ActivatedRoute) {
+    this.route.params.subscribe(({ mapId }) => this.selectMap.emit(mapId));
   }
 
   ngOnInit() {}
 
   ngOnChanges(changes: SimpleChanges) {
     // load elements and subscribe to services
-    if (changes.layers) {
+    if (changes.map) {
       this.preload();
     }
+    this.preload();
   }
 
   ngOnDestroy() {
     // Log.danger('OnDestroy');
   }
 
+  private pendingScripts() {
+    const selectors = new Set();
+    for (const widget of this.map.widgets) {
+      const element = this.elements.find(by({ _id: widget.elementId }));
+      if (element) {
+        selectors.add(element.selector);
+      }
+    }
+
+    const scripts = Array.from(selectors).reduce((acc, selector) => {
+      const script = this.elementMap[selector];
+      const request = this.requestMap[selector];
+      if (!script) {
+        return acc;
+      }
+      const skip = request && (request.loaded || request.loading);
+      return skip ? acc : [...acc, script.element];
+    }, []);
+
+    return scripts;
+  }
+
   preload() {
-    if (!this.layers || !this.available || !this.elements) {
+    const exists = IMap.existsOn(this);
+    if (!exists('map', 'layers', 'elementMap', 'requestMap', 'elements')) {
       return;
     }
 
-    Log.warning('preload');
-
-    // subscribe to services
-    const elementNames = new Set();
     const serviceIds = new Set();
-    this.layers.forEach(layer =>
-      layer.elements.map(item => {
-        elementNames.add(item.element);
-        layer.elements.forEach(element => {
-          element.services.forEach(serviceId => serviceIds.add(serviceId));
+
+    // get list of Nagvis services
+    this.map.widgets.forEach(widget => {
+      if (widget.subscriptions.nagvis) {
+        widget.subscriptions.nagvis.services.forEach(serviceId => {
+          serviceIds.add(serviceId);
         });
-      })
-    );
-
-    if (serviceIds.size > 0) {
-      this.subscriptions.emit(Array.from(serviceIds));
-    }
-
-    // preload elements
-    const elements = [];
-    Array.from(elementNames).forEach(name => {
-      const script = this.available[name];
-      const element = this.elements[name];
-      const loaded = element && element.loaded;
-      if (!loaded) {
-        elements.push(script);
       }
     });
 
-    if (elements.length > 0) {
-      this.load.emit(elements);
+    // subscribe to Nagvis services
+    if (serviceIds.size > 0) {
+      this.subscribe.emit(Array.from(serviceIds));
+    }
+
+    // preload scripts
+    const scripts = this.pendingScripts();
+    if (scripts.length > 0) {
+      this.load.emit(scripts);
     }
   }
 
-  getElementState(element) {
-    return element.services.map(serviceId => {
-      return this.services.find(service => service._id === serviceId);
-    });
+  getWidgetSubscriptions(widget: WidgetModel) {
+    if (widget.subscriptions.nagvis) {
+      const { services } = widget.subscriptions.nagvis;
+      if (services) {
+        return services.map(serviceId => {
+          return this.subscriptions.find(
+            service => service.type === 'service' && service._id === serviceId
+          );
+        });
+      }
+    }
+    return [];
   }
+
+  // async broadcast(state: any) {
+  //   await Promise.all(
+  //     Object.keys(this.scripts)
+  //       .map(key => this.scripts[key])
+  //       .filter(script => script.loaded)
+  //       .map(async ({ name }) => {
+  //         const element = document.querySelector(name);
+  //         element.setAttribute('state', JSON.stringify(state));
+  //       })
+  //   );
+  // }
+
+  // handleMessage(msg): void {
+  //   console.log('shell received message: ', msg.detail);
+  // }
 }

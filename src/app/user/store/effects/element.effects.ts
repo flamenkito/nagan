@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 
-import { of, from } from 'rxjs';
-import { switchMap, map, catchError, tap, mergeMap } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { map, catchError, switchMap, withLatestFrom } from 'rxjs/operators';
 
 import { ElementActions } from '../actions';
 import { FooterActions } from '@app/core/store';
@@ -10,23 +10,31 @@ import { ElementService } from '@app/user/services';
 
 import { getError } from '@app/shared/get-error';
 
+import { Store, select } from '@ngrx/store';
+import { selectElementMap } from '@app/user/store/selectors';
+
 @Injectable()
 export class ElementEffects {
   constructor(
     private readonly actions$: Actions,
-    private readonly elementService: ElementService
+    private readonly elementService: ElementService,
+    private readonly store: Store<any>
   ) {}
 
   @Effect()
   loadElement$ = this.actions$.pipe(
-    ofType<ElementActions.LoadElement>(ElementActions.LOAD_ELEMENT),
-    switchMap(action => {
-      const { element } = action.script;
-      return from(this.elementService.load(action.script)).pipe(
-        map(() => new ElementActions.LoadElementSuccess(element)),
-        catchError(error => {
-          return of(new ElementActions.LoadElementFailure({ element, error }));
-        })
+    ofType<ElementActions.LoadElementRequest>(
+      ElementActions.LOAD_ELEMENT_REQUEST
+    ),
+    withLatestFrom(this.store.pipe(select(selectElementMap))),
+    switchMap(([action, elements]) => {
+      if (this.elementService.isLoaded(action.selector)) {
+        return of(new ElementActions.LoadElementSuccess(action.selector));
+      }
+      const script = elements[action.selector];
+      return this.elementService.tryLoad(script).pipe(
+        map(() => new ElementActions.LoadElementSuccess(action.selector)),
+        catchError(err => of(new ElementActions.LoadElementFailure(err)))
       );
     })
   );

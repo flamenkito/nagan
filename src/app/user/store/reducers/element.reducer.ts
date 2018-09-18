@@ -1,16 +1,15 @@
 import { ElementActions } from '../actions';
-import { ElementModel } from '@app/user/models';
+import { LoadableScriptModel, RequestModel } from '@app/user/models';
+import { IMap } from '@app/shared/models';
 
 export interface State {
-  entities: {
-    [key: string]: ElementModel;
-  };
-  ids: string[];
+  elements: IMap<LoadableScriptModel>;
+  requests: IMap<RequestModel>;
 }
 
 export const INITIAL_STATE: State = {
-  entities: {},
-  ids: []
+  elements: {},
+  requests: {}
 };
 
 export function reducer(
@@ -18,29 +17,27 @@ export function reducer(
   action: ElementActions.Types
 ): State {
   switch (action.type) {
-    case ElementActions.LOAD_ELEMENT: {
-      const { name, description, element, url } = action.script;
+    case ElementActions.INIT: {
+      const { elements } = action;
+      return { ...state, elements };
+    }
+    case ElementActions.LOAD_ELEMENT_REQUEST: {
+      const { selector } = action;
       const request = { loading: true, loaded: false, error: null };
-      const entities = {
-        ...state.entities,
-        [element]: { name, description, element, url, ...request }
-      };
-      return { ...state, entities };
+      const requests = { ...state.requests, [selector]: request };
+      return { ...state, requests };
     }
     case ElementActions.LOAD_ELEMENT_SUCCESS: {
-      const success = { loading: false, loaded: true };
-      const element = { ...state.entities[action.element], ...success };
-      const entities = { ...state.entities, [action.element]: element };
-      return { ...state, entities };
+      const { selector } = action;
+      const success = { loading: false, loaded: true, error: null };
+      const requests = { ...state.requests, [selector]: success };
+      return { ...state, requests };
     }
     case ElementActions.LOAD_ELEMENT_FAILURE: {
-      const { element, error } = action.payload;
+      const { selector, error } = action.payload;
       const failure = { loading: false, loaded: false, error };
-      const entities = {
-        ...state.entities,
-        [element]: { ...state.entities[element], ...failure }
-      };
-      return { ...state, entities };
+      const requests = { ...state.requests, [selector]: failure };
+      return { ...state, requests };
     }
     default: {
       return state;
@@ -48,5 +45,5 @@ export function reducer(
   }
 }
 
-export const getEntities = (state: State) => state.entities;
-export const getIds = (state: State) => state.ids;
+export const getElements = (state: State) => state.elements;
+export const getRequests = (state: State) => state.requests;

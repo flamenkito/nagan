@@ -1,26 +1,26 @@
 <div>
-  <!-- layer -->
-  <div *ngFor="let layer of layers">
-    {{ layer.name }}
-
-    <div style="position: relative;">
-      <!-- element -->
-      <div *ngFor="let element of layer.elements; index as elementIndex"
-        [ngStyle]="element.style"
+  <div *ngIf="map" style="position: relative;">
+    <!-- element -->
+    <div *ngFor="let widget of map.widgets; index as elementIndex"
+        [ngStyle]="widget.style"
         appDraggable
         dragActiveClass="drag-active"
-        (dragEnd)="onDragEnd(layer, elementIndex, $event, el)"
+        (dragEnd)="onDragEnd(map, elementIndex, $event, el)"
         #el>
-        <app-element [element]="element" [state]="getElementState(element)">
+        <app-element [selector]="widget.selector" [state]="getWidgetSubscriptions(widget)">
         </app-element>
       </div>
 
-    </div>
+  </div>
 
+  <!-- layer -->
+  <div *ngFor="let layer of layers">
+    {{ layer.name }}
   </div>
 </div>
 
-<pre>{{ available | json }}</pre>
+<pre>{{ requestMap | json }}</pre>
+<pre>{{ map | json }}</pre>
 <pre>{{ elements | json }}</pre>
 <pre>{{ layers | json }}</pre>
 <pre>{{ services | json }}</pre>

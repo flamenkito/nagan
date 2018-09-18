@@ -1,9 +1,15 @@
 <app-map
+  [elementMap]="elementMap$ | async"
+  [requestMap]="requestMap$ | async"
+
+  [map]="map$ | async"
   [layers]="layers$ | async"
-  [available]="available$ | async"
   [elements]="elements$ | async"
-  [services]="services$ | async"
+  [subscriptions]="subscriptions$ | async"
+
+  (selectMap)="onSelectMap($event)"
+
   (load)="onLoad($event)"
-  (subscriptions)="onSubscribe($event)"
+  (subscribe)="onSubscribe($event)"
   (move)="onMove($event)">
 </app-map>

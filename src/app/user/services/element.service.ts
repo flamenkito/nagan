@@ -1,59 +1,59 @@
 import { Injectable } from '@angular/core';
-import { ScriptModel } from '@app/user/models';
+import { LoadableScriptModel } from '@app/user/models';
+import { Logger } from '@app/shared/logger';
+import { IMap } from '@app/shared/models';
+import { Observable } from 'rxjs';
+
+const Log = Logger('ElementService');
 
 @Injectable()
 export class ElementService {
-  load(element: ScriptModel): Promise<void> {
-    return new Promise((resolve, reject) => {
-      if (!element) {
-        reject(new Error('Missing element'));
+  private loaded: IMap<boolean> = {};
+
+  constructor() {
+    const customElementsDefine = window.customElements.define;
+    window.customElements.define = (name, ...args) => {
+      if (!customElements.get(name)) {
+        customElementsDefine.call(window.customElements, name, ...args);
+      } else {
+        this.loaded[name] = true;
       }
-      const script = document.createElement('script');
-      script.type = 'text/javascript';
-      script.src = element.url;
-      script.onload = () => resolve();
-      script.onerror = (error: any) => reject(error);
-      document.getElementsByTagName('head')[0].appendChild(script);
-    });
+    };
   }
 
-  // async broadcast(state: any) {
-  //   await Promise.all(
-  //     Object.keys(this.scripts)
-  //       .map(key => this.scripts[key])
-  //       .filter(script => script.loaded)
-  //       .map(async ({ name }) => {
-  //         const element = document.querySelector(name);
-  //         element.setAttribute('state', JSON.stringify(state));
-  //       })
-  //   );
-  // }
+  isLoaded(selector: string) {
+    return this.loaded[selector];
+  }
 
-  // _load(name: string): void {
-  //   const configItem = this.scripts[name];
+  public tryLoad(script: LoadableScriptModel): Observable<void> {
+    return Observable.create(observer => {
+      const selector = script.element;
 
-  //   if (configItem.loaded) {
-  //     return;
-  //   }
+      // Complete if already loaded
+      if (this.loaded[selector]) {
+        observer.next();
+        observer.complete();
+      } else {
+        // Add the script
+        this.loaded[selector] = false;
+        // Load the script
+        const scriptElement = document.createElement('script');
+        scriptElement.type = 'text/javascript';
+        scriptElement.async = true;
+        scriptElement.src = script.url;
 
-  //   const content = document.getElementById('content');
+        scriptElement.onload = () => {
+          this.loaded[selector] = true;
+          observer.next();
+          observer.complete();
+        };
 
-  //   const script = document.createElement('script');
-  //   script.src = configItem.path;
-  //   content.appendChild(script);
+        scriptElement.onerror = (error: any) => {
+          observer.error(error);
+        };
 
-  //   const element: HTMLElement = document.createElement(configItem.name);
-  //   content.appendChild(element);
-
-  //   element.addEventListener('message', msg => this.handleMessage(msg));
-  //   element.setAttribute('state', 'init');
-
-  //   script.onerror = () => console.error(`error loading ${configItem.path}`);
-
-  //   //  this.stateService.registerClient(element);
-  // }
-
-  // handleMessage(msg): void {
-  //   console.log('shell received message: ', msg.detail);
-  // }
+        document.getElementsByTagName('body')[0].appendChild(scriptElement);
+      }
+    });
+  }
 }

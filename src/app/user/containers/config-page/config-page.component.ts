@@ -14,6 +14,6 @@ export class ConfigPageComponent {
   config$: Observable<any>;
 
   constructor(private readonly store: Store<fromAuth.State>) {
-    this.config$ = store.pipe(select(fromAuth.selectFirst('config')));
+    this.config$ = store.pipe(select(fromAuth.selectById('config')));
   }
 }

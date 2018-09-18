@@ -15,11 +15,19 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { reducers, effects } from './store';
 
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DragAndDropModule } from '@app/draggable/drag-and-drop.module';
+import { CollapseDirective } from '@app/user/collapse.directive';
 
 @NgModule({
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, DragAndDropModule],
-  declarations: [...containers, ...components],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterModule,
+    FontAwesomeModule,
+    DragAndDropModule
+  ],
+  declarations: [...containers, ...components, CollapseDirective],
   exports: [...containers, ...components]
 })
 export class UserModule {

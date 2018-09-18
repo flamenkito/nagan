@@ -1,23 +1,39 @@
 import { Action } from '@ngrx/store';
-import { ScriptModel } from '@app/user/models';
+import { LoadableScriptModel, RequestModel } from '@app/user/models';
+import { IMap } from '@app/shared/models';
 
 export namespace ElementActions {
-  export const LOAD_ELEMENT = '[Element] Load Element';
+  export const INIT = '[Element] Init';
+  export const LOAD_ELEMENT_REQUEST = '[Element] Load Element Request';
+  export const LOADING_ELEMENT = '[Element] Loading Element';
   export const LOAD_ELEMENT_SUCCESS = '[Element] Load Element Success';
   export const LOAD_ELEMENT_FAILURE = '[Element] Load Element Failure';
 
-  export class LoadElement implements Action {
-    readonly type = LOAD_ELEMENT;
-    constructor(public readonly script: ScriptModel) {}
+  export class Init implements Action {
+    readonly type = INIT;
+    constructor(public readonly elements: IMap<LoadableScriptModel>) {}
+  }
+  export class LoadElementRequest implements Action {
+    readonly type = LOAD_ELEMENT_REQUEST;
+    constructor(public readonly selector: string) {}
+  }
+  export class LoadingElement implements Action {
+    readonly type = LOADING_ELEMENT;
+    constructor(public readonly selector: string) {}
   }
   export class LoadElementSuccess implements Action {
     readonly type = LOAD_ELEMENT_SUCCESS;
-    constructor(public readonly element: string) {}
+    constructor(public readonly selector: string) {}
   }
   export class LoadElementFailure implements Action {
     readonly type = LOAD_ELEMENT_FAILURE;
-    constructor(public readonly payload: { element: string; error: any }) {}
+    constructor(public readonly payload: { selector: string; error: any }) {}
   }
 
-  export type Types = LoadElement | LoadElementSuccess | LoadElementFailure;
+  export type Types =
+    | Init
+    | LoadElementRequest
+    | LoadingElement
+    | LoadElementSuccess
+    | LoadElementFailure;
 }

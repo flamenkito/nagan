@@ -10,25 +10,16 @@ export const selectElementState = createSelector(
     (state && state.element) || fromElement.INITIAL_STATE
 );
 
-export const selectElementEntities = createSelector(
+export const selectElementMap = createSelector(
   selectElementState,
-  fromElement.getEntities
+  fromElement.getElements
 );
 
-export const selectElementIds = createSelector(
+export const selectRequestMap = createSelector(
   selectElementState,
-  fromElement.getIds
+  fromElement.getRequests
 );
 
-export const selectElements = createSelector(
-  selectElementEntities,
-  selectElementIds,
-  (entities, ids) => ids.map(id => entities[id])
-);
-
-export const selectElementById = (name: string) =>
-  createSelector(selectElementEntities, entities => entities[name]);
-
-export const selectElementLoading = createSelector(selectElements, elements =>
-  elements.some(element => element.loading)
-);
+export const selectLoading = createSelector(selectRequestMap, requests => {
+  return Object.keys(requests).some(selector => requests[selector].loading);
+});

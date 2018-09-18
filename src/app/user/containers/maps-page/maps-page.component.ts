@@ -5,9 +5,11 @@ import * as fromAuth from '@app/auth/store';
 import * as fromUser from '@app/user/store';
 import { Store, select } from '@ngrx/store';
 import { Logger } from '@app/shared/logger';
-import { ScriptModel, ElementModel } from '@app/user/models';
 import { ElementActions } from '@app/user/store';
 import { PouchActions } from '@app/auth/store';
+
+import { LoadableScriptModel, RequestModel, MapModel } from '@app/user/models';
+import { DocumentModel, IMap } from '@app/shared/models';
 
 const Log = Logger('MapsPageComponent');
 
@@ -18,22 +20,29 @@ const Log = Logger('MapsPageComponent');
   // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MapsPageComponent {
-  layers$: Observable<any[]>;
-  available$: Observable<{ [key: string]: ScriptModel }>;
-  elements$: Observable<{ [key: string]: ElementModel }>;
-  services$: Observable<any[]>;
+  elementMap$: Observable<IMap<LoadableScriptModel>>;
+  requestMap$: Observable<IMap<RequestModel>>;
+
+  map$: Observable<MapModel>;
+  layers$: Observable<DocumentModel[]>;
+  elements$: Observable<DocumentModel[]>;
+  subscriptions$: Observable<DocumentModel[]>;
 
   constructor(private readonly store: Store<fromUser.State>) {
-    this.layers$ = store.pipe(select(fromAuth.selectDocs('layer')));
-    this.available$ = store.pipe(select(fromAuth.selectAvailable));
-    this.elements$ = store.pipe(select(fromUser.selectElementEntities));
-    this.services$ = store.pipe(select(fromAuth.selectDocs('service')));
+    this.elementMap$ = store.pipe(select(fromUser.selectElementMap));
+    this.requestMap$ = store.pipe(select(fromUser.selectRequestMap));
+
+    this.map$ = store.pipe(select(fromAuth.selectedMap));
+    this.layers$ = store.pipe(select(fromAuth.selectByType('layer')));
+    this.elements$ = store.pipe(select(fromAuth.selectByType('element')));
+    this.subscriptions$ = store.pipe(
+      select(fromAuth.selectByTypes(['service', 'host']))
+    );
   }
 
-  onLoad(elements: ScriptModel[]) {
-    // Log.warning('onLoad', { elements });
-    elements.forEach(element =>
-      this.store.dispatch(new ElementActions.LoadElement(element))
+  onLoad(selectors: string[]) {
+    selectors.forEach(selector =>
+      this.store.dispatch(new ElementActions.LoadElementRequest(selector))
     );
   }
 
@@ -43,5 +52,10 @@ export class MapsPageComponent {
 
   onMove(update) {
     this.store.dispatch(new PouchActions.UpdateOne(update));
+  }
+
+  onSelectMap(mapId: string) {
+    console.log(mapId);
+    this.store.dispatch(new PouchActions.SelectMap(mapId));
   }
 }

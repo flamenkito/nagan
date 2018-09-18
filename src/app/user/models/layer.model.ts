@@ -1,8 +1,8 @@
 import { DocumentModel } from '@app/shared/models';
 
-export interface ElementModel extends DocumentModel {
-  type: 'element';
+export interface LayerModel extends DocumentModel {
+  type: 'layer';
   name: string;
   description: string;
-  selector: string;
+  index: number;
 }

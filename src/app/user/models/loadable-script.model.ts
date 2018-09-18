@@ -1,4 +1,4 @@
-export interface ScriptModel {
+export interface LoadableScriptModel {
   name: string;
   description: string;
   element: string;

@@ -1,7 +1,8 @@
 import { PouchActions } from '../actions';
-import { DocumentModel } from '@app/auth/models';
+import { DocumentModel } from '@app/shared/models';
 
 export interface State {
+  mapId: string | null;
   entities: { [key: string]: DocumentModel };
   ids: string[];
   loading: boolean;
@@ -10,6 +11,7 @@ export interface State {
 }
 
 export const INITIAL_STATE: State = {
+  mapId: null,
   entities: {},
   ids: [],
   loaded: false,
@@ -22,6 +24,10 @@ export function reducer(
   action: PouchActions.Types
 ): State {
   switch (action.type) {
+    case PouchActions.SELECT_MAP: {
+      return { ...state, mapId: action.mapId };
+    }
+
     case PouchActions.SETUP:
     case PouchActions.ACTIVE: {
       return { ...state, loaded: false, loading: true };
@@ -49,6 +55,8 @@ export function reducer(
     }
   }
 }
+
+export const getMapId = (state: State) => state.mapId;
 
 export const getEntities = (state: State) => state.entities;
 export const getIds = (state: State) => state.ids;
