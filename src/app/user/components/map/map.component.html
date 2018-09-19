@@ -1,15 +1,17 @@
 <div>
   <div *ngIf="map" style="position: relative;">
     <!-- element -->
-    <div *ngFor="let widget of map.widgets; index as elementIndex"
+    <div *ngFor="let widget of map.widgets; index as elementIndex">
+      <div *ngIf="widgetVisible(widget)"
         [ngStyle]="widget.style"
         appDraggable
-        dragActiveClass="drag-active"
-        (dragEnd)="onDragEnd(map, elementIndex, $event, el)"
+          dragActiveClass="drag-active"
+          (dragEnd)="onDragEnd(map, elementIndex, $event, el)"
         #el>
         <app-element [selector]="widget.selector" [state]="getWidgetSubscriptions(widget)">
         </app-element>
       </div>
+    </div>
 
   </div>
 

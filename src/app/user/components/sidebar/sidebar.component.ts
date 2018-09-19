@@ -7,7 +7,7 @@ import {
   OnChanges,
   SimpleChanges
 } from '@angular/core';
-import { MapModel } from '@app/user/models';
+import { MapModel, LayerModel } from '@app/user/models';
 
 @Component({
   selector: 'app-sidebar',
@@ -18,9 +18,13 @@ import { MapModel } from '@app/user/models';
 export class SidebarComponent implements OnChanges {
   @Input()
   maps: MapModel[];
+  @Input()
+  layers: LayerModel[];
 
   @Output()
   navigate = new EventEmitter<string[]>();
+  @Output()
+  logout = new EventEmitter<void>();
 
   menuItems: MenuItem[] = [
     {
@@ -28,40 +32,14 @@ export class SidebarComponent implements OnChanges {
       path: ['/user', 'maps'],
       expanded: false,
       active: false,
-      items: [
-        {
-          name: 'Map #1',
-          path: []
-        },
-        {
-          name: 'Map #2',
-          path: []
-        },
-        {
-          name: 'Map #3',
-          path: []
-        }
-      ]
+      items: []
     },
     {
       name: 'Layers',
       path: ['/user', 'layers'],
       expanded: false,
       active: false,
-      items: [
-        {
-          name: 'Layer #1',
-          path: []
-        },
-        {
-          name: 'Layer #2',
-          path: []
-        },
-        {
-          name: 'Layer #3',
-          path: []
-        }
-      ]
+      items: []
     },
     {
       name: 'Documents',
@@ -74,13 +52,21 @@ export class SidebarComponent implements OnChanges {
   ];
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes.maps.currentValue) {
+    if (changes.maps && changes.maps.currentValue) {
       const maps = this.maps || [];
       const mapItems = maps.map(map => {
-        return { name: map.name, path: ['/user', 'maps', map._id] };
+        return { name: map.name, path: ['/user', 'map', map._id] };
       });
       const index = this.menuItems.findIndex(item => item.name === 'Maps');
       this.menuItems[index].items = mapItems;
+    }
+    if (changes.layers && changes.layers.currentValue) {
+      const layers = this.layers || [];
+      const layerItems = layers.map(layer => {
+        return { name: layer.name, path: ['/user', 'layer', layer._id] };
+      });
+      const index = this.menuItems.findIndex(item => item.name === 'Layers');
+      this.menuItems[index].items = layerItems;
     }
   }
 
@@ -99,6 +85,10 @@ export class SidebarComponent implements OnChanges {
     if (menuItem.path) {
       this.navigate.emit(menuItem.path);
     }
+  }
+
+  onLogout() {
+    this.logout.emit();
   }
 }
 

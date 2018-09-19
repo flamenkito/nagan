@@ -1,15 +1,1 @@
-<app-map
-  [elementMap]="elementMap$ | async"
-  [requestMap]="requestMap$ | async"
-
-  [map]="map$ | async"
-  [layers]="layers$ | async"
-  [elements]="elements$ | async"
-  [subscriptions]="subscriptions$ | async"
-
-  (selectMap)="onSelectMap($event)"
-
-  (load)="onLoad($event)"
-  (subscribe)="onSubscribe($event)"
-  (move)="onMove($event)">
-</app-map>
+<app-maps [maps]="mapArray$ | async"></app-maps>

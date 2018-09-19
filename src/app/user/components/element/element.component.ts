@@ -6,6 +6,7 @@ import {
   ChangeDetectionStrategy,
   Renderer2
 } from '@angular/core';
+import { Logger } from '@app/shared/logger';
 
 @Component({
   selector: 'app-element',
@@ -26,6 +27,8 @@ export class ElementComponent implements OnInit {
   ngOnInit() {
     const element = this.renderer.createElement(this.selector);
     this.renderer.appendChild(this.elementRef.nativeElement, element);
-    this.renderer.setAttribute(element, 'state', JSON.stringify(this.state));
+    window.customElements.whenDefined(this.selector).then(() => {
+      this.renderer.setAttribute(element, 'state', JSON.stringify(this.state));
+    });
   }
 }

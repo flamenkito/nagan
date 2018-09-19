@@ -21,12 +21,20 @@ const routes: Routes = [
         component: fromContainers.DocsPageComponent
       },
       {
-        path: 'maps/:mapId',
+        path: 'maps',
         component: fromContainers.MapsPageComponent
       },
       {
-        path: 'maps',
-        component: fromContainers.MapsPageComponent
+        path: 'map/:mapId',
+        component: fromContainers.MapPageComponent
+      },
+      {
+        path: 'layers',
+        component: fromContainers.LayersPageComponent
+      },
+      {
+        path: 'layer/:layerId',
+        component: fromContainers.LayerPageComponent
       }
     ]
   }

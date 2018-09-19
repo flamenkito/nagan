@@ -2,12 +2,6 @@ import { Action } from '@ngrx/store';
 import { TokenModel } from '@app/auth/models';
 
 export namespace PouchActions {
-  export const SELECT_MAP = '[Pouch] Select map';
-  export class SelectMap implements Action {
-    readonly type = SELECT_MAP;
-    constructor(public readonly mapId: string) {}
-  }
-
   export const UNAUTHORIZED = '[Pouch] Unathorized';
 
   export const SETUP = '[Pouch] Setup';
@@ -89,7 +83,6 @@ export namespace PouchActions {
   }
 
   export type Types =
-    | SelectMap
     | Unathorized
     | Setup
     | SetupSuccess

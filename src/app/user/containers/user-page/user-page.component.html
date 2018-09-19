@@ -1,41 +1,18 @@
-<!-- <div class="card mb-1">
-  <div class="card-body text-right">
-    <button class="btn btn-primary" (click)="onLogout()">
-      Logout
-    </button>
-  </div>
-</div>
-<div class="card">
-  <div class="card-header sticky-top">
-    <ul class="nav nav-tabs card-header-tabs">
-      <li class="nav-item">
-        <a class="nav-link" [routerLink]="['/user', 'config']" routerLinkActive="active">Config</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" [routerLink]="['/user', 'maps']" routerLinkActive="active">Maps</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" [routerLink]="['/user', 'docs']" routerLinkActive="active">Documents</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link disabled">Disabled</a>
-      </li>
-    </ul>
-  </div>
-  <div class="card-body">
-    <router-outlet></router-outlet>
-  </div>
-</div> -->
-
 <div class="wrapper">
   <app-sidebar
     [maps]="mapArray$ | async"
-    (selectMap)="onSelectMap($event)"
-    (navigate)="onNavigate($event)"></app-sidebar>
+    [layers]="layerArray$ | async"
+    (navigate)="onNavigate($event)"
+    (logout)="onLogout()">
+  </app-sidebar>
 
   <div id="content">
 
-    <app-navbar></app-navbar>
+    <app-navbar
+      [layers]="layerArray$ | async"
+      [selectedMap]="selectedMap$ | async"
+      (updateMap)="onUpdateMap($event)">
+    </app-navbar>
 
     <router-outlet></router-outlet>
 

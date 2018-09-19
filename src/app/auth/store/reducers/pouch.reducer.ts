@@ -3,6 +3,7 @@ import { DocumentModel } from '@app/shared/models';
 
 export interface State {
   mapId: string | null;
+  layerId: string | null;
   entities: { [key: string]: DocumentModel };
   ids: string[];
   loading: boolean;
@@ -12,6 +13,7 @@ export interface State {
 
 export const INITIAL_STATE: State = {
   mapId: null,
+  layerId: null,
   entities: {},
   ids: [],
   loaded: false,
@@ -24,10 +26,6 @@ export function reducer(
   action: PouchActions.Types
 ): State {
   switch (action.type) {
-    case PouchActions.SELECT_MAP: {
-      return { ...state, mapId: action.mapId };
-    }
-
     case PouchActions.SETUP:
     case PouchActions.ACTIVE: {
       return { ...state, loaded: false, loading: true };

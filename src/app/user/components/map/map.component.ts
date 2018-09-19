@@ -9,20 +9,16 @@ import {
   OnInit,
   OnDestroy
 } from '@angular/core';
+
 import {
-  LoadedScriptModel,
   LayerModel,
   WidgetModel,
   ElementModel,
   LoadableScriptModel,
   RequestModel
 } from '@app/user/models';
-import { Logger } from '@app/shared/logger';
 import { MapModel } from '@app/user/models/map.model';
 import { IMap, DocumentModel } from '@app/shared/models';
-import { ActivatedRoute } from '@angular/router';
-
-const Log = Logger('MapComponent');
 
 const by = (props: IMap) => (item: any) => {
   return Object.keys(props).every(
@@ -64,8 +60,6 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   subscribe = new EventEmitter<string[]>();
   @Output()
   move = new EventEmitter<any>();
-  @Output()
-  selectMap = new EventEmitter<string>();
 
   adjustStyle(element, event) {
     let style = { ...element.style };
@@ -96,10 +90,6 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     this.move.emit({ ...map, widgets });
   }
 
-  constructor(private readonly route: ActivatedRoute) {
-    this.route.params.subscribe(({ mapId }) => this.selectMap.emit(mapId));
-  }
-
   ngOnInit() {}
 
   ngOnChanges(changes: SimpleChanges) {
@@ -112,6 +102,13 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnDestroy() {
     // Log.danger('OnDestroy');
+  }
+
+  widgetVisible(widget: WidgetModel) {
+    if (!this.map || !Array.isArray(this.map.visibleLayerIds)) {
+      return false;
+    }
+    return this.map.visibleLayerIds.includes(widget.layerId);
   }
 
   private pendingScripts() {

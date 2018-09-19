@@ -3,7 +3,7 @@ import { createSelector } from '@ngrx/store';
 import * as fromFeature from '../reducers';
 import * as fromPouch from '../reducers/pouch.reducer';
 import { DocumentModel } from '@app/shared/models';
-import { MapModel } from '@app/user/models';
+import { MapModel, LayerModel } from '@app/user/models';
 
 // pouch
 export const selectPouchState = createSelector(
@@ -61,21 +61,4 @@ export const selectPouchLoaded = createSelector(
 export const selectPouchError = createSelector(
   selectPouchState,
   fromPouch.getError
-);
-
-export const selectedMapId = createSelector(
-  selectPouchState,
-  fromPouch.getMapId
-);
-
-export const selectedMap = createSelector(
-  selectAllDocs,
-  selectedMapId,
-  (docs: DocumentModel[], mapId: string): MapModel => {
-    if (mapId === null) {
-      return docs.find(doc => doc.type === 'map') as MapModel;
-    } else {
-      return docs.find(doc => doc._id === mapId) as MapModel;
-    }
-  }
 );
