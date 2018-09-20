@@ -1,28 +1,23 @@
 <div>
-  <div *ngIf="map" style="position: relative;">
-    <!-- element -->
-    <div *ngFor="let widget of map.widgets; index as elementIndex">
-      <div *ngIf="widgetVisible(widget)"
-        [ngStyle]="widget.style"
+  <div *ngIf="map" style="position: relative; height: 100vh;">
+    <!-- background -->
+    <div #bg style="position: absolute; width: 100%;">
+      <img *ngIf="map.background" [src]="map.background.url" [alt]="map.background.name" [ngStyle]="map.background.style">
+    </div>
+    <!-- elements -->
+    <div *ngFor="let widget of map.widgets; index as elementIndex" class="elements-container">
+      <div *ngIf="widgetVisible(widget)" [ngStyle]="widget.style"
+        [appRelative]="{container: bg, style: widget.style}"
         appDraggable
           dragActiveClass="drag-active"
           (dragEnd)="onDragEnd(map, elementIndex, $event, el)"
         #el>
+        <!-- element -->
+        <div [class]="widgetClass(widget)"></div>
         <app-element [selector]="widget.selector" [state]="getWidgetSubscriptions(widget)">
         </app-element>
       </div>
     </div>
 
   </div>
-
-  <!-- layer -->
-  <div *ngFor="let layer of layers">
-    {{ layer.name }}
-  </div>
 </div>
-
-<pre>{{ requestMap | json }}</pre>
-<pre>{{ map | json }}</pre>
-<pre>{{ elements | json }}</pre>
-<pre>{{ layers | json }}</pre>
-<pre>{{ services | json }}</pre>

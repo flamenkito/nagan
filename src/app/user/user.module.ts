@@ -9,6 +9,7 @@ import { containers } from './containers';
 import { components } from './components';
 import { guards } from './guards';
 import { services } from './services';
+import { directives } from './directives';
 
 // store and effects
 import { StoreModule } from '@ngrx/store';
@@ -17,7 +18,6 @@ import { reducers, effects } from './store';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DragAndDropModule } from '@app/draggable/drag-and-drop.module';
-import { CollapseDirective } from '@app/user/collapse.directive';
 
 @NgModule({
   imports: [
@@ -27,7 +27,7 @@ import { CollapseDirective } from '@app/user/collapse.directive';
     FontAwesomeModule,
     DragAndDropModule
   ],
-  declarations: [...containers, ...components, CollapseDirective],
+  declarations: [...containers, ...components, ...directives],
   exports: [...containers, ...components]
 })
 export class UserModule {

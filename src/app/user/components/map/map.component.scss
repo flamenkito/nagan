@@ -17,3 +17,29 @@
   background-color: rgba(darkorange, 0.5);
   // background-color: rgba(green, 0.5);
 }
+
+.elements-container {
+  border-style: solid;
+  border-width: 1px;
+  border-color: red;
+  width: 0px;
+  height: 0px;
+}
+
+.element-top-left {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  background-color: darkorange;
+}
+
+.element-top-right {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  background-color: darkorange;
+}

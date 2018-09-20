@@ -20,16 +20,20 @@ import {
 import { MapModel } from '@app/user/models/map.model';
 import { IMap, DocumentModel } from '@app/shared/models';
 
-const by = (props: IMap) => (item: any) => {
-  return Object.keys(props).every(
-    prop => String(item[prop]) === String(props[prop])
-  );
-};
+import { Logger } from '@app/shared/logger';
+import { getTranslate, getScale } from '@app/shared/style';
+const Log = Logger('MapComponent');
 
 const findBy = Symbol('findBy');
 Array.prototype[findBy] = (props: IMap) => {
   return Object.keys(props).every(
     prop => String(this[prop]) === String(props[prop])
+  );
+};
+
+const by = (props: IMap) => (item: any) => {
+  return Object.keys(props).every(
+    prop => String(item[prop]) === String(props[prop])
   );
 };
 
@@ -61,33 +65,46 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   @Output()
   move = new EventEmitter<any>();
 
-  adjustStyle(element, event) {
-    let style = { ...element.style };
-    if (element.style.left) {
-      const prevX = +element.style.left.replace('px', '');
-      const left = `${prevX + event.x}px`;
-      style = { ...style, left };
-    }
-    if (element.style.right) {
-      const prevX = +element.style.right.replace('px', '');
-      const right = `${prevX - event.x}px`;
-      style = { ...style, right };
-    }
-    if (element.style.top) {
-      const prevY = +element.style.top.replace('px', '');
-      const top = `${prevY + event.y}px`;
-      style = { ...style, top };
+  adjustStyle(element, event: { x: number; y: number }): IMap {
+    const { style } = element;
+
+    const { x, y, pattern } = getTranslate(style['transform']);
+    const { value } = getScale(style['transform']);
+
+    const add = (delta, pos) => Math.round((+delta / +value + pos) * 100) / 100;
+
+    switch (style['transform-origin']) {
+      case 'top left': {
+        const transform = style.transform.replace(
+          pattern,
+          `translate(${add(event.x, +x)}px, ${add(event.y, +y)}px)`
+        );
+        return { ...style, transform };
+      }
+      case 'top right': {
+        const transform = style.transform.replace(
+          pattern,
+          `translate(${add(event.x, +x)}px, ${add(event.y, +y)}px)`
+        );
+        return { ...style, transform };
+      }
     }
     return style;
   }
+
   onDragEnd(map: MapModel, elementIndex, event, el) {
-    const element = map.widgets[elementIndex];
-    const style = this.adjustStyle(element, event);
-    const widgets = map.widgets.map((item, index) => {
-      return index === elementIndex ? { ...element, style } : item;
-    });
-    el.style.display = 'none';
-    this.move.emit({ ...map, widgets });
+    try {
+      const element = map.widgets[elementIndex];
+      const style = this.adjustStyle(element, event);
+      const widgets = map.widgets.map((item, index) => {
+        return index === elementIndex ? { ...element, style } : item;
+      });
+      el.style.display = 'none';
+      this.move.emit({ ...map, widgets });
+      Log.info('widgets', widgets);
+    } catch (err) {
+      Log.danger('ERROR', err);
+    }
   }
 
   ngOnInit() {}
@@ -159,6 +176,15 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     const scripts = this.pendingScripts();
     if (scripts.length > 0) {
       this.load.emit(scripts);
+    }
+  }
+
+  widgetClass(widget: WidgetModel) {
+    switch (widget.style['transform-origin']) {
+      case 'top left':
+        return 'element-top-left';
+      case 'top right':
+        return 'element-top-right';
     }
   }
 
