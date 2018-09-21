@@ -16,27 +16,33 @@ import { getPx, getScale } from '@app/shared/style';
 })
 export class RelativeDirective implements OnInit {
   @Input('appRelative')
-  appRelative: { container: HTMLElement; style: IMap };
+  appRelative: { base: HTMLElement; style: IMap };
 
   @HostBinding('style.transition')
   transition;
 
-  private isAdaptive() {
-    const img = this.appRelative.container.querySelector('img');
-    return img && img.style['min-width'];
+  @HostListener('window:repaint-layer')
+  onResizeEnd() {
+    this.adjust();
   }
 
-  private adjust(animate: boolean) {
-    if (!this.isAdaptive()) {
+  private getWidth() {
+    const { base } = this.appRelative;
+    if (base && base.style['min-width']) {
+      const min = getPx(base.style['min-width']);
+      const cur = base.getClientRects()[0].width;
+      return { min, cur };
+    }
+  }
+
+  private adjust() {
+    const width = this.getWidth();
+    if (!width) {
       return;
     }
 
-    const baseStyle = window.getComputedStyle(this.appRelative.container, null);
-
-    const img = this.appRelative.container.querySelector('img');
-    const minWidth = getPx(img.style['min-width']);
-    const actualWidth = img.getClientRects()[0].width;
-    const zoomFactor = actualWidth / minWidth;
+    // const baseStyle = window.getComputedStyle(this.appRelative.base, null);
+    const zoomFactor = width.cur / width.min;
 
     const { style } = this.appRelative as any;
     const scale = getScale(style.transform);
@@ -45,19 +51,13 @@ export class RelativeDirective implements OnInit {
       `scale(${scale.value * zoomFactor})`
     );
 
-    // console.log(animate, style.transform, transform, zoomFactor);
-    this.elementRef.nativeElement.style.transform = transform;
-    this.elementRef.nativeElement.style.transition = 'transform 0.4s';
-  }
-
-  ngOnInit() {
-    this.adjust(false);
-  }
-
-  @HostListener('window:repaint-layer')
-  onResizeEnd() {
-    this.adjust(true);
+    const el = this.elementRef.nativeElement as HTMLElement;
+    el.style.transform = transform;
   }
 
   constructor(private readonly elementRef: ElementRef) {}
+
+  ngOnInit() {
+    this.adjust();
+  }
 }

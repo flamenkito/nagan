@@ -4,6 +4,8 @@ import { MapsComponent } from './maps/maps.component';
 import { ElementComponent } from './element/element.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { NavbarComponent } from './navbar/navbar.component';
+import { LeafletComponent } from './map/leaflet/leaflet.component';
+import { ImageComponent } from './map/image/image.component';
 
 export const components = [
   DocsComponent,
@@ -11,5 +13,7 @@ export const components = [
   MapComponent,
   MapsComponent,
   NavbarComponent,
-  SidebarComponent
+  SidebarComponent,
+  LeafletComponent,
+  ImageComponent
 ];

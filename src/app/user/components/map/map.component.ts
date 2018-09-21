@@ -7,12 +7,12 @@ import {
   OnChanges,
   SimpleChanges,
   OnInit,
-  OnDestroy
+  OnDestroy,
+  Renderer2
 } from '@angular/core';
 
 import {
   LayerModel,
-  WidgetModel,
   ElementModel,
   LoadableScriptModel,
   RequestModel
@@ -21,7 +21,6 @@ import { MapModel } from '@app/user/models/map.model';
 import { IMap, DocumentModel } from '@app/shared/models';
 
 import { Logger } from '@app/shared/logger';
-import { getTranslate, getScale } from '@app/shared/style';
 const Log = Logger('MapComponent');
 
 const findBy = Symbol('findBy');
@@ -65,47 +64,75 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   @Output()
   move = new EventEmitter<any>();
 
-  adjustStyle(element, event: { x: number; y: number }): IMap {
-    const { style } = element;
-
-    const { x, y, pattern } = getTranslate(style['transform']);
-    const { value } = getScale(style['transform']);
-
-    const add = (delta, pos) => Math.round((+delta / +value + pos) * 100) / 100;
-
-    switch (style['transform-origin']) {
-      case 'top left': {
-        const transform = style.transform.replace(
-          pattern,
-          `translate(${add(event.x, +x)}px, ${add(event.y, +y)}px)`
-        );
-        return { ...style, transform };
-      }
-      case 'top right': {
-        const transform = style.transform.replace(
-          pattern,
-          `translate(${add(event.x, +x)}px, ${add(event.y, +y)}px)`
-        );
-        return { ...style, transform };
-      }
-    }
-    return style;
+  onWidgetMove({ elementIndex, style }) {
+    const element = this.map.widgets[elementIndex];
+    const widgets = this.map.widgets.map((item, index) => {
+      return index === elementIndex ? { ...element, style } : item;
+    });
+    this.move.emit({ ...this.map, widgets });
   }
+  // options = {
+  //   minZoom: 1,
+  //   maxZoom: 4,
+  //   center: [0, 0],
+  //   zoom: 2,
+  //   crs: CRS.Simple
+  // };
 
-  onDragEnd(map: MapModel, elementIndex, event, el) {
-    try {
-      const element = map.widgets[elementIndex];
-      const style = this.adjustStyle(element, event);
-      const widgets = map.widgets.map((item, index) => {
-        return index === elementIndex ? { ...element, style } : item;
+  onMapReady(map: L.Map) {
+    /*
+    const height = 1500;
+    const width = 2000;
+    const southWest = map.unproject([0, height], map.getMaxZoom() - 1);
+    const northEast = map.unproject([width, 0], map.getMaxZoom() - 1);
+    const bounds = new LatLngBounds(southWest, northEast);
+
+    imageOverlay(this.map.background.url, bounds).addTo(map);
+    map.setMaxBounds(bounds);
+
+    const element = document.createElement('client-counter');
+
+    const applyZoom = toZoom => {
+      const zoom = (1 / (map.getMaxZoom() + 1)) * toZoom;
+      element.style.transformOrigin = 'center';
+      if (!element.style.transform.includes('scale')) {
+        console.log(element.style.transform);
+        // element.style.transform += ` scale(${zoom})`;
+      }
+    };
+
+    const m = Widget.marker
+      .widget([-85.5, 107], element)
+      .addTo(map)
+      .bindPopup('Custom element')
+      .on('drag', e => {
+        applyZoom(map.getZoom());
+      })
+      .on('dragend', e => {
+        const { lat, lng } = m['_latlng'];
+        console.log('dragend', { lat, lng });
       });
-      el.style.display = 'none';
-      this.move.emit({ ...map, widgets });
-      Log.info('widgets', widgets);
-    } catch (err) {
-      Log.danger('ERROR', err);
-    }
+
+    console.log(m);
+    element.setAttribute('state', JSON.stringify({ test: 'test' }));
+
+    map.on('viewreset', e => {
+      applyZoom(map.getZoom());
+    });
+
+    map.on('zoomstart', e => {
+      applyZoom(map.getZoom());
+      // element.style.visibility = 'hidden';
+    });
+
+    map.on('zoomend', e => {
+      applyZoom(map.getZoom());
+      // element.style.visibility = 'visible';
+    });
+*/
   }
+
+  constructor(private readonly renderer: Renderer2) {}
 
   ngOnInit() {}
 
@@ -119,13 +146,6 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
 
   ngOnDestroy() {
     // Log.danger('OnDestroy');
-  }
-
-  widgetVisible(widget: WidgetModel) {
-    if (!this.map || !Array.isArray(this.map.visibleLayerIds)) {
-      return false;
-    }
-    return this.map.visibleLayerIds.includes(widget.layerId);
   }
 
   private pendingScripts() {
@@ -177,29 +197,6 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     if (scripts.length > 0) {
       this.load.emit(scripts);
     }
-  }
-
-  widgetClass(widget: WidgetModel) {
-    switch (widget.style['transform-origin']) {
-      case 'top left':
-        return 'element-top-left';
-      case 'top right':
-        return 'element-top-right';
-    }
-  }
-
-  getWidgetSubscriptions(widget: WidgetModel) {
-    if (widget.subscriptions.nagvis) {
-      const { services } = widget.subscriptions.nagvis;
-      if (services) {
-        return services.map(serviceId => {
-          return this.subscriptions.find(
-            service => service.type === 'service' && service._id === serviceId
-          );
-        });
-      }
-    }
-    return [];
   }
 
   // async broadcast(state: any) {

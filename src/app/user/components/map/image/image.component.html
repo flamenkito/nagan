@@ -1,0 +1,30 @@
+<!-- background -->
+<div
+  style="position: absolute; width: 100%"
+  [ngStyle]="map.background.image.style"
+  appResize
+    (resize)="onResize();"
+  #base>
+  <img [src]="map.background.image.url" [alt]="map.background.name">
+</div>
+<!-- elements -->
+<div *ngFor="let widget of map.widgets; index as elementIndex"
+  class="elements-container"
+  style="position: relative;">
+  <!-- container -->
+  <div *ngIf="widgetVisible(widget)"
+    [ngStyle]="widget.style"
+    [appRelative]="{ base: base, style: widget.style }"
+    appDraggable
+      dragActiveClass="drag-active"
+      (dragEnd)="onDragEnd(widget, elementIndex, $event, container)"
+    #container>
+    <!-- element -->
+    <div [class]="widgetClass(widget)">
+    </div>
+    <app-element
+      [selector]="widget.selector"
+      [state]="getWidgetSubscriptions(widget)">
+    </app-element>
+  </div>
+</div>

@@ -2,21 +2,12 @@
   <div *ngIf="map" style="position: relative; height: 100vh;">
     <!-- background -->
     <div #bg style="position: absolute; width: 100%;">
-      <img *ngIf="map.background" [src]="map.background.url" [alt]="map.background.name" [ngStyle]="map.background.style">
-    </div>
-    <!-- elements -->
-    <div *ngFor="let widget of map.widgets; index as elementIndex" class="elements-container">
-      <div *ngIf="widgetVisible(widget)" [ngStyle]="widget.style"
-        [appRelative]="{container: bg, style: widget.style}"
-        appDraggable
-          dragActiveClass="drag-active"
-          (dragEnd)="onDragEnd(map, elementIndex, $event, el)"
-        #el>
-        <!-- element -->
-        <div [class]="widgetClass(widget)"></div>
-        <app-element [selector]="widget.selector" [state]="getWidgetSubscriptions(widget)">
-        </app-element>
-      </div>
+      <app-image *ngIf="map.background?.image"
+        [map]="map"
+        [subscriptions]="subscriptions"
+        (move)="onWidgetMove($event)">
+      </app-image>
+      <app-leaflet *ngIf="map?.background?.leaflet"></app-leaflet>
     </div>
 
   </div>

@@ -184,3 +184,20 @@ a.article:hover {
     display: none;
   }
 }
+
+.leaflet-control-liveupdate a {
+  background: #fff url(/assets/liveupdate.png) no-repeat 0 0;
+  background-size: 26px 52px;
+}
+.leaflet-liveupdate-on .leaflet-control-liveupdate a {
+  background-position: 0 -26px;
+}
+.leaflet-liveupdate-on a {
+  background-position: 0 -26px;
+}
+.leaflet-control-messagebox {
+  display: none; /* Initially hidden */
+  border: 2px solid red;
+  background-color: white;
+  padding: 3px 10px;
+}

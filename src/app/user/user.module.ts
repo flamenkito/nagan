@@ -18,6 +18,7 @@ import { reducers, effects } from './store';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { DragAndDropModule } from '@app/draggable/drag-and-drop.module';
+import { LeafletModule } from '@asymmetrik/ngx-leaflet';
 
 @NgModule({
   imports: [
@@ -25,7 +26,8 @@ import { DragAndDropModule } from '@app/draggable/drag-and-drop.module';
     ReactiveFormsModule,
     RouterModule,
     FontAwesomeModule,
-    DragAndDropModule
+    DragAndDropModule,
+    LeafletModule.forRoot()
   ],
   declarations: [...containers, ...components, ...directives],
   exports: [...containers, ...components]

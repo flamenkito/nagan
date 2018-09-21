@@ -6,11 +6,24 @@ export interface MapModel extends DocumentModel {
   type: 'map';
   name: string;
   description: string;
-  background: {
+  background?: {
     name: string;
     description: string;
-    url: string;
-    style: IMap;
+    leaflet?: {
+      zoom: number;
+      center: {
+        lat: number;
+        lon: number;
+      };
+    };
+    image?: {
+      url: string;
+      style: IMap;
+    };
+  };
+  geo?: {
+    zoom: number;
+    center: { lat: number; lon: number };
   };
   visibleLayerIds: string[];
   widgets: WidgetModel[];
