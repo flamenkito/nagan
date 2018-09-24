@@ -4,9 +4,7 @@ import {
   Input,
   Output,
   EventEmitter,
-  OnInit,
-  ViewChild,
-  ElementRef
+  OnInit
 } from '@angular/core';
 
 import { WidgetModel, MapModel } from '@app/user/models';
@@ -15,18 +13,6 @@ import { IMap, DocumentModel } from '@app/shared/models';
 
 import { Logger } from '@app/shared/logger';
 const Log = Logger('ImageComponent');
-
-import ResizeObserver from 'resize-observer-polyfill';
-
-const entriesMap = new WeakMap();
-const ro = new ResizeObserver(entries => {
-  for (const entry of entries) {
-    if (entriesMap.has(entry.target)) {
-      const comp = entriesMap.get(entry.target);
-      comp._resizeCallback(entry);
-    }
-  }
-});
 
 @Component({
   selector: 'app-image',
@@ -39,7 +25,6 @@ export class ImageComponent implements OnInit {
   map: MapModel;
   @Input()
   subscriptions: DocumentModel[];
-
   @Output()
   move = new EventEmitter<any>();
 
@@ -63,17 +48,7 @@ export class ImageComponent implements OnInit {
   }
 
   getWidgetSubscriptions(widget: WidgetModel) {
-    if (widget.subscriptions.nagvis) {
-      const { services } = widget.subscriptions.nagvis;
-      if (services) {
-        return services.map(serviceId => {
-          return this.subscriptions.find(
-            service => service.type === 'service' && service._id === serviceId
-          );
-        });
-      }
-    }
-    return [];
+    return WidgetModel.getSubscriptionsFrom(widget, this.subscriptions);
   }
 
   adjustStyle(element, event: { x: number; y: number }): IMap {

@@ -7,7 +7,16 @@
         [subscriptions]="subscriptions"
         (move)="onWidgetMove($event)">
       </app-image>
-      <app-leaflet *ngIf="map?.background?.leaflet"></app-leaflet>
+      <app-leaflet *ngIf="map?.background?.leaflet"
+        [map]="map"
+        [subscriptions]="subscriptions"
+        (move)="onWidgetMove($event)">
+      </app-leaflet>
+      <app-leaflet *ngIf="map?.background?.viewer"
+        [map]="map"
+        [subscriptions]="subscriptions"
+        (move)="onWidgetMove($event)">
+      </app-leaflet>
     </div>
 
   </div>

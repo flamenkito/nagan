@@ -2,6 +2,11 @@ import { DocumentModel, IMap } from '@app/shared/models';
 
 import { WidgetModel } from './widget.model';
 
+interface Pos {
+  lat: number;
+  lng: number;
+}
+
 export interface MapModel extends DocumentModel {
   type: 'map';
   name: string;
@@ -10,20 +15,18 @@ export interface MapModel extends DocumentModel {
     name: string;
     description: string;
     leaflet?: {
-      zoom: number;
-      center: {
-        lat: number;
-        lon: number;
-      };
+      options: IMap;
+      objects: { type: string; center: Pos; options: IMap }[];
+    };
+    viewer?: {
+      url: string;
+      options: IMap;
+      objects: { type: string; center: Pos; options: IMap }[];
     };
     image?: {
       url: string;
       style: IMap;
     };
-  };
-  geo?: {
-    zoom: number;
-    center: { lat: number; lon: number };
   };
   visibleLayerIds: string[];
   widgets: WidgetModel[];

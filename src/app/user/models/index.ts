@@ -1,5 +1,4 @@
 export * from './config.model';
-export * from './element.model';
 export * from './layer.model';
 export * from './loadable-script.model';
 export * from './loaded-script.model';

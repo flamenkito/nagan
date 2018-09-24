@@ -27,7 +27,7 @@ export class ElementService {
 
   public tryLoad(script: LoadableScriptModel): Observable<void> {
     return Observable.create(observer => {
-      const selector = script.element;
+      const selector = script.selector;
 
       // Complete if already loaded
       if (this.loaded[selector]) {

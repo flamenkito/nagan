@@ -11,35 +11,25 @@ export const getScale = value => {
 L.WidgetIcon = L.DivIcon.extend({
   options: {
     element: document.createElement('div'),
-    iconSize: [12, 12], // also can be set through CSS
-    /*
-		iconAnchor: (Point)
-		popupAnchor: (Point)
-		html: (String)
-		bgPos: (Point)
-		*/
     className: 'leaflet-div-icon',
     html: false
   },
 
   createIcon: function(oldIcon) {
-    var div =
-        oldIcon && oldIcon.tagName === 'DIV' ? oldIcon : this.options.element,
-      options = this.options;
-
-    if (options.html !== false) {
-      div.innerHTML = options.html;
-    } else {
-      div.innerHTML = '';
+    if (oldIcon) {
+      throw new Error('Unexpected behavior');
     }
 
-    if (options.bgPos) {
-      div.style.backgroundPosition =
-        -options.bgPos.x + 'px ' + -options.bgPos.y + 'px';
+    const { element, bgPos } = this.options;
+
+    if (bgPos) {
+      element.style.backgroundPosition = -bgPos.x + 'px ' + -bgPos.y + 'px';
     }
 
-    this._setIconStyles(div, 'icon');
-    return div;
+    this._setIconStyles(element, 'icon');
+
+    element.style['min-width'] = '300px';
+    return element;
   },
 
   createShadow: function() {
@@ -88,11 +78,11 @@ L.Marker.Widget = L.Marker.extend({
   }
 });
 
-L.marker.widget = function(latlng, element) {
+L.marker.widget = function(latlng, element, iconSize) {
   return new L.Marker.Widget(latlng, {
     draggable: true,
     icon: new L.WidgetIcon({
-      iconSize: [300, 300],
+      // iconSize,
       element
     })
   });

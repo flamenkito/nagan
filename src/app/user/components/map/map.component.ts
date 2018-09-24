@@ -13,9 +13,10 @@ import {
 
 import {
   LayerModel,
-  ElementModel,
   LoadableScriptModel,
-  RequestModel
+  RequestModel,
+  SubscriptionsModel,
+  WidgetModel
 } from '@app/user/models';
 import { MapModel } from '@app/user/models/map.model';
 import { IMap, DocumentModel } from '@app/shared/models';
@@ -53,8 +54,6 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   @Input()
   layers: LayerModel[];
   @Input()
-  elements: ElementModel[];
-  @Input()
   subscriptions: DocumentModel[];
 
   @Output()
@@ -64,75 +63,13 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   @Output()
   move = new EventEmitter<any>();
 
-  onWidgetMove({ elementIndex, style }) {
+  onWidgetMove({ elementIndex, style, center }) {
     const element = this.map.widgets[elementIndex];
     const widgets = this.map.widgets.map((item, index) => {
-      return index === elementIndex ? { ...element, style } : item;
+      return index === elementIndex ? { ...element, style, center } : item;
     });
     this.move.emit({ ...this.map, widgets });
   }
-  // options = {
-  //   minZoom: 1,
-  //   maxZoom: 4,
-  //   center: [0, 0],
-  //   zoom: 2,
-  //   crs: CRS.Simple
-  // };
-
-  onMapReady(map: L.Map) {
-    /*
-    const height = 1500;
-    const width = 2000;
-    const southWest = map.unproject([0, height], map.getMaxZoom() - 1);
-    const northEast = map.unproject([width, 0], map.getMaxZoom() - 1);
-    const bounds = new LatLngBounds(southWest, northEast);
-
-    imageOverlay(this.map.background.url, bounds).addTo(map);
-    map.setMaxBounds(bounds);
-
-    const element = document.createElement('client-counter');
-
-    const applyZoom = toZoom => {
-      const zoom = (1 / (map.getMaxZoom() + 1)) * toZoom;
-      element.style.transformOrigin = 'center';
-      if (!element.style.transform.includes('scale')) {
-        console.log(element.style.transform);
-        // element.style.transform += ` scale(${zoom})`;
-      }
-    };
-
-    const m = Widget.marker
-      .widget([-85.5, 107], element)
-      .addTo(map)
-      .bindPopup('Custom element')
-      .on('drag', e => {
-        applyZoom(map.getZoom());
-      })
-      .on('dragend', e => {
-        const { lat, lng } = m['_latlng'];
-        console.log('dragend', { lat, lng });
-      });
-
-    console.log(m);
-    element.setAttribute('state', JSON.stringify({ test: 'test' }));
-
-    map.on('viewreset', e => {
-      applyZoom(map.getZoom());
-    });
-
-    map.on('zoomstart', e => {
-      applyZoom(map.getZoom());
-      // element.style.visibility = 'hidden';
-    });
-
-    map.on('zoomend', e => {
-      applyZoom(map.getZoom());
-      // element.style.visibility = 'visible';
-    });
-*/
-  }
-
-  constructor(private readonly renderer: Renderer2) {}
 
   ngOnInit() {}
 
@@ -144,17 +81,12 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
     this.preload();
   }
 
-  ngOnDestroy() {
-    // Log.danger('OnDestroy');
-  }
+  ngOnDestroy() {}
 
   private pendingScripts() {
     const selectors = new Set();
     for (const widget of this.map.widgets) {
-      const element = this.elements.find(by({ _id: widget.elementId }));
-      if (element) {
-        selectors.add(element.selector);
-      }
+      selectors.add(widget.selector);
     }
 
     const scripts = Array.from(selectors).reduce((acc, selector) => {
@@ -164,7 +96,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
         return acc;
       }
       const skip = request && (request.loaded || request.loading);
-      return skip ? acc : [...acc, script.element];
+      return skip ? acc : [...acc, script.selector];
     }, []);
 
     return scripts;
@@ -172,24 +104,22 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
 
   preload() {
     const exists = IMap.existsOn(this);
-    if (!exists('map', 'layers', 'elementMap', 'requestMap', 'elements')) {
+    if (!exists('map', 'layers', 'elementMap', 'requestMap')) {
       return;
     }
 
-    const serviceIds = new Set();
+    const uniqueIds = new Set();
 
     // get list of Nagvis services
     this.map.widgets.forEach(widget => {
-      if (widget.subscriptions.nagvis) {
-        widget.subscriptions.nagvis.services.forEach(serviceId => {
-          serviceIds.add(serviceId);
-        });
-      }
+      WidgetModel.onSubscriptions(widget, (type, ids) => {
+        ids.forEach(id => uniqueIds.add(id));
+      });
     });
 
     // subscribe to Nagvis services
-    if (serviceIds.size > 0) {
-      this.subscribe.emit(Array.from(serviceIds));
+    if (uniqueIds.size > 0) {
+      this.subscribe.emit(Array.from(uniqueIds));
     }
 
     // preload scripts

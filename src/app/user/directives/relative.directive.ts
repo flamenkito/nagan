@@ -7,7 +7,6 @@ import {
   OnInit
 } from '@angular/core';
 
-import { Logger } from '@app/shared/logger';
 import { IMap } from '@app/shared/models';
 import { getPx, getScale } from '@app/shared/style';
 

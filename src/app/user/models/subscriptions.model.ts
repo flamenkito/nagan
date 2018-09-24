@@ -1,6 +1,10 @@
 export interface SubscriptionsModel {
   nagvis?: {
-    hosts: string[];
-    services: string[];
+    host: string[];
+    service: string[];
   };
+}
+
+export namespace SubscriptionsModel {
+  export const NAGVIS = ['host', 'service', 'hostgroup', 'servicegroup'];
 }

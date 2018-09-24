@@ -17,7 +17,7 @@ export const reducers: ActionReducerMap<State> = {
 export function logger(reducer: ActionReducer<State>): ActionReducer<State> {
   return function(state: State, action: any): State {
     if (action.constructor.name !== 'Object') {
-      console.log(action);
+      // console.log(action);
     }
     return reducer(state, action);
   };

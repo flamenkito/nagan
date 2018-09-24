@@ -1,6 +1,6 @@
 export interface LoadableScriptModel {
   name: string;
   description: string;
-  element: string;
+  selector: string;
   url: string;
 }

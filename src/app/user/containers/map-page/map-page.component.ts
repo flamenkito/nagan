@@ -11,6 +11,9 @@ import { LoadableScriptModel, RequestModel, MapModel } from '@app/user/models';
 import { DocumentModel, IMap } from '@app/shared/models';
 import { ActivatedRoute } from '@angular/router';
 
+import { Logger } from '@app/shared/logger';
+const Log = Logger('MapPageComponent');
+
 @Component({
   selector: 'app-map-page',
   templateUrl: './map-page.component.html',
@@ -23,7 +26,6 @@ export class MapPageComponent {
 
   map$: Observable<MapModel>;
   layers$: Observable<DocumentModel[]>;
-  elements$: Observable<DocumentModel[]>;
   subscriptions$: Observable<DocumentModel[]>;
 
   constructor(
@@ -39,7 +41,6 @@ export class MapPageComponent {
 
     this.map$ = store.pipe(select(fromUser.selectedMap));
     this.layers$ = store.pipe(select(fromAuth.selectByType('layer')));
-    this.elements$ = store.pipe(select(fromAuth.selectByType('element')));
     this.subscriptions$ = store.pipe(
       select(fromAuth.selectByTypes(['service', 'host']))
     );
@@ -52,7 +53,7 @@ export class MapPageComponent {
   }
 
   onSubscribe(services: string[]) {
-    // Log.warning('onSubscribe', { services });
+    Log.warning('onSubscribe', { services });
   }
 
   onMove(update) {

@@ -6,7 +6,6 @@ import {
   ChangeDetectionStrategy,
   Renderer2
 } from '@angular/core';
-import { Logger } from '@app/shared/logger';
 
 @Component({
   selector: 'app-element',
