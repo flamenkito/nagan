@@ -1,4 +1,6 @@
-# Angular Client Starter
+# Nagan
+
+Nagvis-like client written in Angular + PouchDB
 
 ### Temporary fixes
 

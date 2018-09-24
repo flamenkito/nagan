@@ -7,9 +7,6 @@ import PouchDB from 'pouchdb';
 import PouchDBFind from 'pouchdb-find';
 PouchDB.plugin(PouchDBFind);
 
-import JWT from './pouchdb-jwt/index';
-PouchDB.plugin(JWT);
-
 import { takeUntil, catchError, map } from 'rxjs/operators';
 import { PouchActions } from '@app/auth/store/actions';
 import { PayloadModel, TokenModel } from '@app/auth/models';
