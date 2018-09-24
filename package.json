@@ -1,6 +1,6 @@
 {
-  "name": "angular-client-starter",
-  "version": "1.0.0",
+  "name": "nagan",
+  "version": "0.0.1",
   "author": "flamenkito",
   "license": "MIT",
   "scripts": {
@@ -44,12 +44,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/flamenkito/angular-client-starter.git"
+    "url": "https://github.com/flamenkito/nagan.git"
   },
   "bugs": {
-    "url": "https://github.com/flamenkito/angular-client-starter/issues"
+    "url": "https://github.com/flamenkito/nagan/issues"
   },
-  "homepage": "https://github.com/flamenkito/angular-client-starter/",
+  "homepage": "https://github.com/flamenkito/nagan/",
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.6.8",
     "@angular/cli": "~6.0.8",
