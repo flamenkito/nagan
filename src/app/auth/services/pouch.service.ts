@@ -107,15 +107,6 @@ export class PouchService implements OnDestroy {
         return res.rows.map(row => row.doc);
       })
     );
-    /*
-    return from(this.localDb.find({ selector: { type: 'doc' } })).pipe(
-      map((res: PouchDB.Find.FindResponse<{}>) => {
-        return new PouchActions.AllDocs(res.docs);
-      }),
-      catchError(err => of(new PouchActions.OperationFailure(err)))
-      // share()
-    );
-    */
   }
 
   updateOne(update: any): Observable<PouchDB.Core.Response> {

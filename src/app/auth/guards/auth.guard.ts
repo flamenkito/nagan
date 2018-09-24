@@ -7,8 +7,9 @@ import { map, take } from 'rxjs/operators';
 
 import * as fromAuth from '@app/auth/store';
 
-import { LocalStorageService, AUTH_KEY } from '@app/auth/services';
+import { LocalStorageService } from '@app/auth/services';
 import { AuthActions } from '@app/auth/store';
+import { environment } from '@env/environment';
 
 @Injectable()
 export class AuthGuard implements CanLoad, CanActivate, CanActivateChild {
@@ -25,7 +26,7 @@ export class AuthGuard implements CanLoad, CanActivate, CanActivateChild {
     return this.store.select(fromAuth.selectToken).pipe(
       map(token => {
         if (!token) {
-          const auth = this.localStorageService.getItem(AUTH_KEY);
+          const auth = this.localStorageService.getItem(environment.auth);
           if (auth && auth.token) {
             // try to use stored token
             this.store.dispatch(

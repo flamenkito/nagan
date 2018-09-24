@@ -33,7 +33,7 @@ export namespace WidgetModel {
 
   export function getSubscriptionsFrom(
     widget: WidgetModel,
-    sources: DocumentModel[],
+    sources: DocumentModel[]
   ): string[] {
     const subscriptions = [];
     onSubscriptions(widget, (type, ids) => {

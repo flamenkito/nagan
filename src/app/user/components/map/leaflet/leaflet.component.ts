@@ -7,14 +7,19 @@ import {
   ElementRef,
   Input,
   Output,
-  EventEmitter
+  EventEmitter,
+  OnChanges,
+  SimpleChanges
 } from '@angular/core';
 
 import * as L from 'leaflet';
-import { MapModel } from '@app/user/models';
-import { DocumentModel } from '@app/shared/models';
+import { MapModel, WidgetModel } from '@app/user/models';
+import { DocumentModel, IMap } from '@app/shared/models';
 
 import { Widget } from './plugins';
+
+import { Logger } from '@app/shared/logger';
+const Log = Logger('LeafletComponent');
 
 @Component({
   selector: 'app-leaflet',
@@ -22,7 +27,7 @@ import { Widget } from './plugins';
   styleUrls: ['./leaflet.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class LeafletComponent implements OnInit, OnDestroy {
+export class LeafletComponent implements OnInit, OnChanges, OnDestroy {
   @ViewChild('leaflet')
   leaflet: ElementRef;
   @Input()
@@ -31,6 +36,8 @@ export class LeafletComponent implements OnInit, OnDestroy {
   subscriptions: DocumentModel[];
   @Output()
   move = new EventEmitter<any>();
+
+  updaters = [];
 
   leafletMap() {
     const config = this.map.background.leaflet;
@@ -75,12 +82,20 @@ export class LeafletComponent implements OnInit, OnDestroy {
 
     this.map.widgets.forEach((widget, elementIndex) => {
       customElements.whenDefined(widget.selector).then(() => {
+        const element = document.createElement(widget.selector);
+        element.style.visibility = 'hidden';
+        // save the reference
+        this.updaters.push(subscriptions => {
+          const state = WidgetModel.getSubscriptionsFrom(
+            widget,
+            this.subscriptions
+          );
+          element.style.visibility = 'visible';
+          element.setAttribute('state', JSON.stringify(state));
+        });
+        // add to map
         const widgetMarker = Widget.marker
-          .widget(
-            [widget.center.lat, widget.center.lng],
-            document.createElement(widget.selector),
-            [300, 400]
-          )
+          .widget([widget.center.lat, widget.center.lng], element, [300, 400])
           .addTo(map)
           .on('dragend', () => {
             const { lat, lng } = widgetMarker['_latlng'];
@@ -107,10 +122,24 @@ export class LeafletComponent implements OnInit, OnDestroy {
       }
     });
 
+    setTimeout(() => {
+      this.render();
+    }, 300);
+
     this.ngOnDestroy = () => {
       map.remove();
       map.off();
     };
+  }
+
+  render() {
+    this.updaters.forEach(updater => updater());
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes.subscriptions.currentValue) {
+      this.render();
+    }
   }
 
   ngOnDestroy() {}

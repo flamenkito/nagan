@@ -8,14 +8,12 @@ import {
   SimpleChanges,
   OnInit,
   OnDestroy,
-  Renderer2
 } from '@angular/core';
 
 import {
   LayerModel,
   LoadableScriptModel,
   RequestModel,
-  SubscriptionsModel,
   WidgetModel
 } from '@app/user/models';
 import { MapModel } from '@app/user/models/map.model';

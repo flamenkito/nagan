@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 
-const APP_PREFIX = 'DEBARES-';
-
-export const AUTH_KEY = 'AUTH';
+import { environment } from '@env/environment';
 
 @Injectable()
 export class LocalStorageService {
@@ -10,10 +8,10 @@ export class LocalStorageService {
 
   static loadInitialState() {
     return Object.keys(localStorage).reduce((state: any, storageKey) => {
-      if (storageKey.includes(APP_PREFIX)) {
+      if (storageKey.includes(environment.app)) {
         state = state || {};
         const stateKey = storageKey
-          .replace(APP_PREFIX, '')
+          .replace(environment.app, '')
           .toLowerCase()
           .split('.');
         let currentStateRef = state;
@@ -31,10 +29,10 @@ export class LocalStorageService {
   }
 
   setItem(key: string, value: any) {
-    localStorage.setItem(`${APP_PREFIX}${key}`, JSON.stringify(value));
+    localStorage.setItem(`${environment.app}${key}`, JSON.stringify(value));
   }
 
   getItem(key: string) {
-    return JSON.parse(localStorage.getItem(`${APP_PREFIX}${key}`));
+    return JSON.parse(localStorage.getItem(`${environment.app}${key}`));
   }
 }
