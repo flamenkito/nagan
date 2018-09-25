@@ -1,5 +1,5 @@
 [appDraggable] {
-  background-color: rgba(gray, 0.5);
+  background-color: rgba(gray, 0.1);
   padding: 0.3rem;
   border-radius: 0.3rem;
   display: flex;
@@ -14,7 +14,7 @@
 }
 
 [appDraggable]:hover {
-  background-color: rgba(darkorange, 0.5);
+  background-color: rgba(darkorange, 0.3);
   // background-color: rgba(green, 0.5);
 }
 
@@ -32,7 +32,7 @@
   left: 0;
   width: 10px;
   height: 10px;
-  background-color: darkorange;
+  background-color: rgba(darkorange, 0.3);
 }
 
 .element-top-right {
@@ -41,5 +41,5 @@
   right: 0;
   width: 10px;
   height: 10px;
-  background-color: darkorange;
+  background-color: rgba(darkorange, 0.3);
 }

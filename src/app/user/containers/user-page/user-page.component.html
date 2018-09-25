@@ -8,7 +8,7 @@
 
   <div id="content">
 
-    <app-navbar
+    <app-navbar style="position: fixed; top: 1rem; right: 1rem; z-index: 1000;"
       [layers]="layerArray$ | async"
       [selectedMap]="selectedMap$ | async"
       (updateMap)="onUpdateMap($event)">

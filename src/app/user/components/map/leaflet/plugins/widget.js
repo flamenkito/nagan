@@ -10,8 +10,9 @@ export const getScale = value => {
 
 L.WidgetIcon = L.DivIcon.extend({
   options: {
+    iconSize: [],
     element: document.createElement('div'),
-    className: 'leaflet-div-icon',
+    className: 'leaflet-widget-icon',
     html: false
   },
 
@@ -28,7 +29,7 @@ L.WidgetIcon = L.DivIcon.extend({
 
     this._setIconStyles(element, 'icon');
 
-    element.style['min-width'] = '300px';
+    element.style['min-width'] = '12px';
     return element;
   },
 

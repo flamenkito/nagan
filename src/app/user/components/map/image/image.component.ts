@@ -14,6 +14,8 @@ import { IMap, DocumentModel } from '@app/shared/models';
 import { Logger } from '@app/shared/logger';
 const Log = Logger('ImageComponent');
 
+import * as JSONfn from 'json-fn';
+
 @Component({
   selector: 'app-image',
   templateUrl: './image.component.html',

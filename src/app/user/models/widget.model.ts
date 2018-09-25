@@ -1,6 +1,11 @@
 import { IMap, DocumentModel } from '@app/shared/models';
 
 import { SubscriptionsModel } from './subscriptions.model';
+import { Logger } from '@app/shared/logger';
+
+const Log = Logger('WidgetModel');
+
+type Mapper = (subscriptions: DocumentModel[]) => any;
 
 export interface WidgetModel extends DocumentModel {
   type: 'widget';
@@ -13,6 +18,7 @@ export interface WidgetModel extends DocumentModel {
     lng: number;
   };
   subscriptions: SubscriptionsModel;
+  mapper: string;
 }
 
 export namespace WidgetModel {
@@ -34,15 +40,29 @@ export namespace WidgetModel {
   export function getSubscriptionsFrom(
     widget: WidgetModel,
     sources: DocumentModel[]
-  ): string[] {
+  ): any {
     const subscriptions = [];
     onSubscriptions(widget, (type, ids) => {
       subscriptions.push(
-        ids.map(id => {
+        ...ids.map(id => {
           return sources.find(doc => doc.type === type && doc._id === id);
         })
       );
     });
+
+    // mapper
+    try {
+      if (widget.mapper) {
+        /* tslint:disable:no-eval */
+        const mapper = eval(widget.mapper) as Mapper;
+        return mapper(subscriptions);
+        /* tslint:enable:no-eval */
+      }
+    } catch (err) {
+      Log.danger('getSubscriptionsFrom', err);
+    }
+
+    // defaults
     return subscriptions;
   }
 }
