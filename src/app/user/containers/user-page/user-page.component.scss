@@ -4,6 +4,14 @@
   top: 1rem;
   z-index: 1000;
 }
+
 .card-header {
   background-color: #fafafa;
+}
+
+app-navbar {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1000;
 }

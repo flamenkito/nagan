@@ -4,7 +4,9 @@ import {
   OnInit,
   ElementRef,
   ChangeDetectionStrategy,
-  Renderer2
+  Renderer2,
+  Output,
+  EventEmitter
 } from '@angular/core';
 
 @Component({
@@ -17,6 +19,10 @@ export class ElementComponent implements OnInit {
   selector: string;
   @Input()
   state: any;
+  @Input()
+  options: any;
+  @Output()
+  message = new EventEmitter();
 
   constructor(
     private readonly elementRef: ElementRef,
@@ -25,8 +31,10 @@ export class ElementComponent implements OnInit {
 
   ngOnInit() {
     const element = this.renderer.createElement(this.selector);
+    element.addEventListener('message', message => this.message.emit(message));
     this.renderer.appendChild(this.elementRef.nativeElement, element);
     window.customElements.whenDefined(this.selector).then(() => {
+      this.renderer.setAttribute(element, 'options', JSON.stringify(this.options));
       this.renderer.setAttribute(element, 'state', JSON.stringify(this.state));
     });
   }

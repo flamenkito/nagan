@@ -15,13 +15,21 @@ export interface MapModel extends DocumentModel {
     name: string;
     description: string;
     leaflet?: {
+      dpi: number;
       options: IMap;
       objects: { type: string; center: Pos; options: IMap }[];
     };
     viewer?: {
       url: string;
+      width: number;
+      height: number;
+      dpi: number;
       options: IMap;
-      objects: { type: string; center: Pos; options: IMap }[];
+      objects: {
+        type: string;
+        center: Pos;
+        options: IMap;
+      }[];
     };
     image?: {
       url: string;

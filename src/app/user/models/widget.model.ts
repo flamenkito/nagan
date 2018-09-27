@@ -13,12 +13,14 @@ export interface WidgetModel extends DocumentModel {
   elementId: string;
   selector: string;
   style: IMap;
+  dpi?: number;
   center?: {
     lat: number;
     lng: number;
   };
   subscriptions: SubscriptionsModel;
   mapper: string;
+  options: IMap;
 }
 
 export namespace WidgetModel {

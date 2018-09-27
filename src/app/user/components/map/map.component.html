@@ -5,17 +5,20 @@
       <app-image *ngIf="map.background?.image"
         [map]="map"
         [subscriptions]="subscriptions"
-        (move)="onWidgetMove($event)">
+        (move)="onWidgetMove($event)"
+        (message)="onMessage($event)">
       </app-image>
       <app-leaflet *ngIf="map?.background?.leaflet"
         [map]="map"
         [subscriptions]="subscriptions"
-        (move)="onWidgetMove($event)">
+        (move)="onWidgetMove($event)"
+        (message)="onMessage($event)">
       </app-leaflet>
       <app-leaflet *ngIf="map?.background?.viewer"
         [map]="map"
         [subscriptions]="subscriptions"
-        (move)="onWidgetMove($event)">
+        (move)="onWidgetMove($event)"
+        (message)="onMessage($event)">
       </app-leaflet>
     </div>
 

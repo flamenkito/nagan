@@ -12,6 +12,7 @@ import { DocumentModel, IMap } from '@app/shared/models';
 import { ActivatedRoute } from '@angular/router';
 
 import { Logger } from '@app/shared/logger';
+import { RouterActions } from '@app/core/store';
 const Log = Logger('MapPageComponent');
 
 @Component({
@@ -58,5 +59,18 @@ export class MapPageComponent {
 
   onMove(update) {
     this.store.dispatch(new PouchActions.UpdateOne(update));
+  }
+
+  onMessage({ detail: { type, payload, meta } }) {
+    switch (type) {
+      case 'NAVIGATE': {
+        const { mapId } = payload;
+        if (mapId) {
+          this.store.dispatch(
+            new RouterActions.Navigate(['/user', 'map', mapId])
+          );
+        }
+      }
+    }
   }
 }

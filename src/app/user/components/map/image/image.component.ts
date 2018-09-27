@@ -29,6 +29,8 @@ export class ImageComponent implements OnInit {
   subscriptions: DocumentModel[];
   @Output()
   move = new EventEmitter<any>();
+  @Output()
+  message = new EventEmitter();
 
   ngOnInit() {}
 
@@ -88,5 +90,9 @@ export class ImageComponent implements OnInit {
     } catch (err) {
       Log.danger('ERROR', err);
     }
+  }
+
+  onMessage(message) {
+    this.message.emit(message);
   }
 }

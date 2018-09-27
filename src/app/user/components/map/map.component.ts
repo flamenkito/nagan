@@ -7,7 +7,7 @@ import {
   OnChanges,
   SimpleChanges,
   OnInit,
-  OnDestroy,
+  OnDestroy
 } from '@angular/core';
 
 import {
@@ -60,6 +60,8 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   subscribe = new EventEmitter<string[]>();
   @Output()
   move = new EventEmitter<any>();
+  @Output()
+  message = new EventEmitter();
 
   onWidgetMove({ elementIndex, style, center }) {
     const element = this.map.widgets[elementIndex];
@@ -139,7 +141,7 @@ export class MapComponent implements OnInit, OnChanges, OnDestroy {
   //   );
   // }
 
-  // handleMessage(msg): void {
-  //   console.log('shell received message: ', msg.detail);
-  // }
+  onMessage(message) {
+    this.message.emit(message);
+  }
 }

@@ -39,14 +39,20 @@ export class LeafletComponent implements OnInit, OnChanges, OnDestroy {
   subscriptions: DocumentModel[];
   @Output()
   move = new EventEmitter<any>();
+  @Output()
+  message = new EventEmitter();
 
   updaters = [];
   scalers = [];
   renderers = [];
 
+  fix = { touchExtend: false } as any;
+
   leafletMap(onTileLoad) {
     const config = this.map.background.leaflet;
-    const map = L.map(this.leaflet.nativeElement, { ...config.options });
+    const map = L.map(this.leaflet.nativeElement, {
+      ...config.options
+    });
 
     const tile = L.tileLayer(
       'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -67,10 +73,12 @@ export class LeafletComponent implements OnInit, OnChanges, OnDestroy {
 
   leafletImage(onTileLoad) {
     const config = this.map.background.viewer;
-    const map = L.map(this.leaflet.nativeElement, config.options);
+    const map = L.map(this.leaflet.nativeElement, {
+      ...config.options,
+      crs: L.CRS.Simple
+    });
 
-    const height = 1500;
-    const width = 2000;
+    const { width, height } = config;
     const southWest = map.unproject([0, height], map.getMaxZoom() - 1);
     const northEast = map.unproject([width, 0], map.getMaxZoom() - 1);
     const bounds = new L.LatLngBounds(southWest, northEast);
@@ -135,11 +143,24 @@ export class LeafletComponent implements OnInit, OnChanges, OnDestroy {
       return;
     }
 
+    // TODO: refactor @Input
+    const sidebar = document.getElementById('sidebar');
+    sidebar.addEventListener('transitionend', () => {
+      map.invalidateSize();
+    });
+
     // scaleControl.addTo(map);
 
     this.map.widgets.forEach((widget, elementIndex) => {
       customElements.whenDefined(widget.selector).then(() => {
         const element = document.createElement(widget.selector);
+        element.addEventListener('message', message =>
+          this.message.emit(message)
+        );
+        // set options on init
+        if (widget.options) {
+          element.setAttribute('options', JSON.stringify(widget.options));
+        }
         // hidden until scale
         element.style.transition = '';
         element.style.opacity = '0.00';
@@ -170,7 +191,7 @@ export class LeafletComponent implements OnInit, OnChanges, OnDestroy {
           }
           const { transform } = element.style;
           const scale = getScale(transform);
-          const factor = 300 / denominator;
+          const factor = (widget.dpi || config.dpi) / denominator;
           if (scale) {
             element.style.transform = transform.replace(
               scale.pattern,
@@ -187,6 +208,10 @@ export class LeafletComponent implements OnInit, OnChanges, OnDestroy {
         const widgetMarker = Widget.marker
           .widget([widget.center.lat, widget.center.lng], element, [300, 400])
           .addTo(map)
+          .on('drag', () => {
+            const denominator = this.getDenomitator(map, scaleControl);
+            this.scalers.forEach(scaler => scaler(denominator));
+          })
           .on('dragend', () => {
             const { lat, lng } = widgetMarker['_latlng'];
             this.move.emit({ elementIndex, center: { lat, lng } });
@@ -194,12 +219,15 @@ export class LeafletComponent implements OnInit, OnChanges, OnDestroy {
       });
 
       map
-        .on('zoomend', e => {
+        .on('zoomend', () => {
           const denominator = this.getDenomitator(map, scaleControl);
           this.scalers.forEach(scaler => scaler(denominator));
         })
         .on('zoomstart', () => {
           this.hideWidgets();
+        })
+        .on('click', e => {
+          Log.info('click', e['latlng']);
         });
     });
 
